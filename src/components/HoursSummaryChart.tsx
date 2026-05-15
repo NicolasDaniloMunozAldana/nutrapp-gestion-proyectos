@@ -5,7 +5,6 @@ import type { JiraIssue } from '../types/jira';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
 
 export const HoursSummaryChart = ({ issues }: { issues: JiraIssue[] }) => {
-    debugger
   const data = {
     labels: ['Por hacer', 'En curso', 'Listo'],
     datasets: [

@@ -1,7 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import styled from '@emotion/styled';
-import InfiniteScroll from "react-infinite-scroll-component";
-import CircularProgress from '@mui/material/CircularProgress';
 import { useIssues } from '../hooks/useIssues';
 import { KanbanColumn } from '../components/KanbanColumn/KanbanColumn';
 import { Filters } from '../components/Filters/Filters';
@@ -31,16 +29,6 @@ const ColumnsContainer = styled.div`
   }
 `;
 
-const LoadingMessage = styled.div`
-  text-align: center;
-  font-size: 1.2rem;
-  color: #5e6c84;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
 const ErrorMessage = styled.div`
   text-align: center;
   padding: 40px;
@@ -63,7 +51,6 @@ export const Dashboard = () => {
     pagination,
     goToPage
   } = useIssues();
-  const [page, setPage] = useState(1);
   const { users, loading: usersLoading } = useUsers();
   const { projects, loading: projectLoading } = useProjects();
 

@@ -5,9 +5,9 @@ export interface JiraAssignee {
 }
 
 export interface JiraUsers {
-  name: string; 
-  accountId: any; 
-  avatarUrls: { [x: string]: any;}
+  name: string;
+  accountId: string;
+  avatarUrls: { [x: string]: string };
 }
 
 export interface JiraIssue {
