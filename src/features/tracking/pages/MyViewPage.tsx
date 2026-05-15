@@ -295,7 +295,7 @@ export const MyViewPage = () => {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.1fr)',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                 gap: 16,
               }}
             >
@@ -314,7 +314,7 @@ export const MyViewPage = () => {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                 gap: 16,
                 alignItems: 'stretch',
               }}

@@ -62,7 +62,7 @@ export const MemberSwitcher = ({ teams, currentAccountId, onSelect }: MemberSwit
             position: 'absolute',
             right: 0,
             top: 'calc(100% + 6px)',
-            zIndex: 20,
+            zIndex: 60,
             width: 320,
             maxHeight: 360,
             overflow: 'auto',

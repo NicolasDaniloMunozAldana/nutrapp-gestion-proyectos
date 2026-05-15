@@ -84,8 +84,16 @@ export const CompletadosSection = ({ tickets }: CompletadosSectionProps) => {
           </span>
         </div>
       </div>
-      <div style={{ overflow: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, fontSize: 13 }}>
+      <div style={{ overflowX: 'auto' }}>
+        <table
+          style={{
+            width: '100%',
+            minWidth: 880,
+            borderCollapse: 'separate',
+            borderSpacing: 0,
+            fontSize: 13,
+          }}
+        >
           <thead>
             <tr>
               <th style={{ ...thStyle, width: 90 }}>Jira</th>

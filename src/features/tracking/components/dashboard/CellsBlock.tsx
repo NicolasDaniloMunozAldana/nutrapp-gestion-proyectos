@@ -22,12 +22,11 @@ export const CellsBlock = ({ teams, onSelectMember, showRating }: CellsBlockProp
     );
   }
 
-  const cols = Math.min(3, Math.max(1, teams.length));
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
         gap: 16,
       }}
     >
@@ -62,7 +61,7 @@ export const CellsBlock = ({ teams, onSelectMember, showRating }: CellsBlockProp
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {t.members.length === 0 ? (
               <div style={{ fontSize: 12.5, color: '#94A3B8' }}>
-                Sin integrantes con tickets activos.
+                Sin miembros configurados para este equipo.
               </div>
             ) : (
               t.members.map((m) => (

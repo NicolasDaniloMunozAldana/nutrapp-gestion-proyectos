@@ -212,7 +212,7 @@ export const DashboardPage = () => {
             style={{
               display: 'grid',
               gap: 16,
-              gridTemplateColumns: 'repeat(6, minmax(0, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
             }}
           >
             {Array.from({ length: 6 }).map((_, i) => (
@@ -236,7 +236,7 @@ export const DashboardPage = () => {
             style={{
               display: 'grid',
               gap: 16,
-              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             }}
           >
             {Array.from({ length: 3 }).map((_, i) => (
@@ -255,7 +255,7 @@ export const DashboardPage = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
               gap: 16,
             }}
           >
@@ -276,13 +276,13 @@ export const DashboardPage = () => {
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr)',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
                   gap: 16,
                 }}
               >
                 <HeatmapPanel rows={data.heatmap} />
                 <BurndownPanel data={data.burndown} />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
                   <DistributionPanel data={data.distribution} />
                   <RankingPanel members={data.ranking} onSelect={handleSelectMember} />
                 </div>

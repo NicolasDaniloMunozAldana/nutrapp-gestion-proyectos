@@ -63,14 +63,21 @@ const HeroKPI = ({ icon, iconBg, label, value, last }: HeroKpiProps) => (
 export const PersonalHero = ({ member, showRating }: PersonalHeroProps) => {
   const c = colorForUser(member.accountId || member.name);
   const ratingBlock = showRating && member.rating !== null;
-  const cols = ratingBlock ? 'minmax(0, 3.4fr) minmax(280px, 1fr)' : '1fr';
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: cols, gap: 16 }}>
-      <Card padding={0} style={{ overflow: 'hidden' }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: ratingBlock
+          ? 'repeat(auto-fit, minmax(320px, 1fr))'
+          : '1fr',
+        gap: 16,
+      }}
+    >
+      <Card padding={0} style={{ overflow: 'hidden', minWidth: 0 }}>
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '260px repeat(4, 1fr)',
+            gridTemplateColumns: 'minmax(200px, 240px) repeat(auto-fit, minmax(140px, 1fr))',
             alignItems: 'stretch',
           }}
         >

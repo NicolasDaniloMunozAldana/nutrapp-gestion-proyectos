@@ -98,13 +98,13 @@ const KPI = ({
 
 export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
   const previewCap = 6;
-  const commentTone = kpis.comments.coveragePct >= 80 ? '#15803D' : kpis.comments.coveragePct >= 60 ? '#B45309' : '#B91C1C';
+  void showRating;
   return (
     <div
       style={{
         display: 'grid',
         gap: 16,
-        gridTemplateColumns: `repeat(${showRating ? 7 : 6}, minmax(0, 1fr))`,
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
       }}
     >
       <KPI
@@ -230,48 +230,6 @@ export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
         iconColor="#22C55E"
         trend={kpis.trends.completados}
         trendColor="#22C55E"
-      />
-      <KPI
-        label="Comentarios"
-        value={`${kpis.comments.actual}/${kpis.comments.expected}`}
-        suffix={`${kpis.comments.coveragePct}%`}
-        icon={
-          <svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-            <path
-              d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4V6z"
-              stroke="#0EA5E9"
-              strokeWidth="1.6"
-              strokeLinejoin="round"
-            />
-          </svg>
-        }
-        iconBg="#E0F2FE"
-        iconColor="#0EA5E9"
-        footer={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-            <div
-              style={{
-                flex: 1,
-                height: 6,
-                borderRadius: 999,
-                background: '#F1F5F9',
-                overflow: 'hidden',
-              }}
-            >
-              <div
-                style={{
-                  width: `${kpis.comments.coveragePct}%`,
-                  height: '100%',
-                  background: commentTone,
-                  borderRadius: 999,
-                }}
-              />
-            </div>
-            <span style={{ fontSize: 11, color: '#94A3B8', fontWeight: 600 }}>
-              esperados vs total
-            </span>
-          </div>
-        }
       />
       {showRating && kpis.ratingAvg !== null && (
         <KPI

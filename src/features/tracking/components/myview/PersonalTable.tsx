@@ -141,14 +141,15 @@ export const PersonalTable = ({ tickets }: PersonalTableProps) => {
           </span>
         </div>
       </div>
-      <div style={{ overflow: 'auto' }}>
+      <div style={{ overflowX: 'auto' }}>
         <table
           style={{
             width: '100%',
+            minWidth: 1100,
             borderCollapse: 'separate',
             borderSpacing: 0,
             fontSize: 13.5,
-            tableLayout: 'fixed',
+            tableLayout: 'auto',
           }}
         >
           <thead>

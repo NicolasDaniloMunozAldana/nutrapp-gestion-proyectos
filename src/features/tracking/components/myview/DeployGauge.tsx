@@ -34,8 +34,6 @@ export const DeployGauge = ({ avgDays }: DeployGaugeProps) => {
           <circle cx={cx} cy={cy} r="6" fill="#0F172A" />
         </svg>
         <div style={{ flex: 1, paddingBottom: 4, borderLeft: '1px solid #F1F5F9', paddingLeft: 14 }}>
-          <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 600 }}>Límite recomendado</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: '#0F172A', marginTop: 2 }}>10 días</div>
         </div>
       </div>
       <div style={{ textAlign: 'center', marginTop: -14 }}>

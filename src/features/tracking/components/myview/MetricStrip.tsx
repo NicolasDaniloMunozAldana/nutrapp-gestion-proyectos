@@ -66,16 +66,23 @@ export const MetricStrip = ({ metrics }: MetricStripProps) => {
   ];
   return (
     <Card padding={0}>
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${items.length}, 1fr)` }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        }}
+      >
         {items.map((it, i) => (
           <div
             key={i}
             style={{
               padding: '16px 20px',
               borderRight: i === items.length - 1 ? 'none' : '1px solid #F1F5F9',
+              borderBottom: '1px solid #F1F5F9',
               display: 'flex',
               alignItems: 'center',
               gap: 14,
+              minWidth: 0,
             }}
           >
             <div style={{ flex: 1, minWidth: 0 }}>

@@ -173,14 +173,15 @@ export const TrackingShell = ({
             display: 'flex',
             alignItems: 'flex-end',
             justifyContent: 'space-between',
-            padding: '28px 32px 20px',
-            gap: 24,
+            padding: '24px 32px 16px',
+            gap: 16,
             borderBottom: `1px solid ${trackingTokens.border.soft}`,
-            background: 'rgba(248,250,252,0.85)',
+            background: 'rgba(248,250,252,0.92)',
             backdropFilter: 'blur(8px)',
             position: 'sticky',
             top: 0,
-            zIndex: 10,
+            zIndex: 5,
+            flexWrap: 'wrap',
           }}
         >
           <div>
