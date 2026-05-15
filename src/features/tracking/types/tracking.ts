@@ -32,6 +32,7 @@ export interface TrackingTeamDto {
   key?: string;
   organizationId?: string | null;
   memberCount: number;
+  rating: number | null;
   source: TrackingTeamsSource;
 }
 
@@ -143,7 +144,25 @@ export interface TrackingOverviewDto {
   burndown: Array<{ d: string; abierto: number; cerrado: number }>;
   distribution: Array<{ id: string; n: number }>;
   ranking: TrackingMemberSummaryDto[];
+  activeTickets: TrackingActiveTicketDto[];
   teamsSource: TrackingTeamsSource;
+}
+
+export interface TrackingActiveTicketDto {
+  key: string;
+  summary: string;
+  url: string;
+  owner: TrackingMemberRef;
+  teamId: string | null;
+  teamName: string | null;
+  estado: TrackingEstado;
+  dias: number;
+  sla: number;
+  alerta: TrackingAlerta;
+  diario: TrackingDiario;
+  prioridad: string;
+  expectedComments: number;
+  actualComments: number;
 }
 
 export interface TrackingTicketDetailDto {
@@ -186,9 +205,11 @@ export interface TrackingMemberDetailDto {
     proximos: number;
   };
   commentsDonut: {
+    expectedTotal: number;
+    actualTotal: number;
     hoy: number;
-    ayer: number;
-    sin: number;
+    anteriores: number;
+    pendientes: number;
   };
   completed: TrackingTicketDetailDto[];
   tickets: TrackingTicketDetailDto[];

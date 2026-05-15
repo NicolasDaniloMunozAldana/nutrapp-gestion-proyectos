@@ -91,8 +91,12 @@ export const MemberCard = ({ member, onSelect, showRating }: MemberCardProps) =>
         </div>
       )}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        {showRating && member.rating !== null ? (
+        {member.rating !== null ? (
           <Stars value={member.rating} size={11} />
+        ) : showRating ? (
+          <span style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>
+            Sin calificación
+          </span>
         ) : (
           <span style={{ fontSize: 11, color: '#94A3B8', fontWeight: 500 }}>
             {member.counts.total} ticket{member.counts.total === 1 ? '' : 's'}

@@ -1,5 +1,6 @@
 import { Card } from '../shared/Card';
 import { Pill } from '../shared/Pill';
+import { Stars } from '../shared/Stars';
 import { MemberCard } from './MemberCard';
 import { colorForTeam } from '../../styles/tokens';
 import type { TrackingTeamLoadDto } from '../../types/tracking';
@@ -56,7 +57,12 @@ export const CellsBlock = ({ teams, onSelectMember, showRating }: CellsBlockProp
                 · {t.members.length}
               </span>
             </div>
-            <Pill tone="neutral">{t.totalEnCurso} en curso</Pill>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {t.team.rating !== null && (
+                <Stars value={t.team.rating} size={11} />
+              )}
+              <Pill tone="neutral">{t.totalEnCurso} en curso</Pill>
+            </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {t.members.length === 0 ? (

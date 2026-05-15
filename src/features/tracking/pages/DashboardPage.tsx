@@ -10,6 +10,7 @@ import { HeatmapPanel } from '../components/dashboard/HeatmapPanel';
 import { BurndownPanel } from '../components/dashboard/BurndownPanel';
 import { DistributionPanel } from '../components/dashboard/DistributionPanel';
 import { RankingPanel } from '../components/dashboard/RankingPanel';
+import { ActiveTicketsTable } from '../components/dashboard/ActiveTicketsTable';
 import { FiltersBar } from '../components/dashboard/FiltersBar';
 import { SkeletonCard } from '../components/shared/Skeleton';
 import type { TrackingFilters } from '../types/tracking';
@@ -77,8 +78,8 @@ export const DashboardPage = () => {
   const { data, isLoading, error, refetch } = useOverview(filters);
 
   const showRating = useMemo(
-    () => (data?.ranking ? data.ranking.length > 0 : false),
-    [data?.ranking],
+    () => data?.kpis.ratingAvg !== null && data?.kpis.ratingAvg !== undefined,
+    [data?.kpis.ratingAvg],
   );
 
   const handleSelectMember = (accountId: string) => navigate(`/mi-vista/${accountId}`);
@@ -264,6 +265,29 @@ export const DashboardPage = () => {
           </div>
         )}
 
+        {data && (
+          <>
+            <SectionHeader
+              title="Tickets activos"
+              subtitle="Todos los miembros · scope de los 4 equipos"
+            />
+            <ActiveTicketsTable
+              tickets={data.activeTickets}
+              onSelectMember={handleSelectMember}
+            />
+          </>
+        )}
+
+        {data && data.ranking.length > 0 && (
+          <>
+            <SectionHeader
+              title="Top performers"
+              subtitle="Calificación individual por integrante"
+            />
+            <RankingPanel members={data.ranking} onSelect={handleSelectMember} />
+          </>
+        )}
+
         {data &&
           (data.heatmap.length > 0 ||
             data.burndown.length > 1 ||
@@ -284,7 +308,6 @@ export const DashboardPage = () => {
                 <BurndownPanel data={data.burndown} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
                   <DistributionPanel data={data.distribution} />
-                  <RankingPanel members={data.ranking} onSelect={handleSelectMember} />
                 </div>
               </div>
             </>

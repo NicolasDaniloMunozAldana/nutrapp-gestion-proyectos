@@ -1,30 +1,44 @@
 import { Card } from '../shared/Card';
 
 interface CommentsDonutProps {
-  data: { hoy: number; ayer: number; sin: number };
+  data: {
+    expectedTotal: number;
+    actualTotal: number;
+    hoy: number;
+    anteriores: number;
+    pendientes: number;
+  };
 }
 
 export const CommentsDonut = ({ data }: CommentsDonutProps) => {
-  const total = data.hoy + data.ayer + data.sin || 1;
+  const total = Math.max(1, data.expectedTotal);
   const segs = [
-    { v: data.hoy, color: '#22C55E', label: 'Con comentario' },
-    { v: data.ayer, color: '#F59E0B', label: 'Ayer' },
-    { v: data.sin, color: '#EF4444', label: 'Sin update' },
+    { v: data.hoy, color: '#22C55E', label: 'Hoy' },
+    { v: data.anteriores, color: '#0EA5E9', label: 'Anteriores en periodo' },
+    { v: data.pendientes, color: '#EF4444', label: 'Sin update' },
   ];
   const R = 50;
   const C = 64;
   let acc = 0;
+  const sumSegs = data.hoy + data.anteriores + data.pendientes || 1;
+  const coverage = data.expectedTotal === 0
+    ? 100
+    : Math.min(100, Math.round((data.actualTotal / data.expectedTotal) * 100));
+
   return (
     <Card padding={20}>
       <div style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>
         Comentarios diarios{' '}
-        <span style={{ color: '#94A3B8', fontWeight: 500, fontSize: 12 }}>(Hoy)</span>
+        <span style={{ color: '#94A3B8', fontWeight: 500, fontSize: 12 }}>
+          (esperado vs registrado)
+        </span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginTop: 14 }}>
         <svg width={C * 2} height={C * 2} viewBox={`0 0 ${C * 2} ${C * 2}`}>
           <circle cx={C} cy={C} r={R} stroke="#F1F5F9" strokeWidth="14" fill="none" />
           {segs.map((s, i) => {
-            const frac = s.v / total;
+            if (s.v <= 0) return null;
+            const frac = s.v / sumSegs;
             const len = frac * 2 * Math.PI * R;
             const off = -acc * 2 * Math.PI * R;
             const el = (
@@ -46,10 +60,10 @@ export const CommentsDonut = ({ data }: CommentsDonutProps) => {
             return el;
           })}
           <text x={C} y={C - 2} textAnchor="middle" fontSize="22" fontWeight="700" fill="#0F172A">
-            {data.hoy + data.ayer + data.sin}
+            {data.actualTotal}/{data.expectedTotal}
           </text>
           <text x={C} y={C + 14} textAnchor="middle" fontSize="9" fontWeight="600" fill="#94A3B8">
-            TOTAL
+            {coverage}%
           </text>
         </svg>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -76,14 +90,28 @@ export const CommentsDonut = ({ data }: CommentsDonutProps) => {
                 {s.label}
               </span>
               <span style={{ color: '#475569', fontWeight: 600 }}>
-                {s.v}{' '}
-                <span style={{ color: '#94A3B8', fontWeight: 500 }}>
-                  ({Math.round((100 * s.v) / total)}%)
-                </span>
+                {s.v}
+                {data.expectedTotal > 0 && (
+                  <span style={{ color: '#94A3B8', fontWeight: 500, marginLeft: 4 }}>
+                    ({Math.round((100 * s.v) / total)}%)
+                  </span>
+                )}
               </span>
             </div>
           ))}
         </div>
+      </div>
+      <div
+        style={{
+          marginTop: 10,
+          fontSize: 11,
+          color: '#94A3B8',
+          fontWeight: 500,
+          lineHeight: 1.4,
+        }}
+      >
+        Total esperado = días hábiles que cada incidencia "En proceso" ha estado activa
+        (1 comentario / día / incidencia).
       </div>
     </Card>
   );
