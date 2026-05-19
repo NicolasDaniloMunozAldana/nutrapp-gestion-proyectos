@@ -7,8 +7,7 @@ import type {
   TrackingTeamLoadDto,
 } from '../types/tracking';
 
-const API_BASE_URL =
-  (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:3001/api';
+const API_BASE_URL = (import.meta.env.VITE_API_URL as string | undefined)
 
 const client = axios.create({
   baseURL: `${API_BASE_URL}/tracking`,

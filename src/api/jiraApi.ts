@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { JiraUsers, JiraIssue, JiraProject } from '../types/jira';
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL as string | undefined;
 
 interface FetchIssuesParams {
   project?: string;
