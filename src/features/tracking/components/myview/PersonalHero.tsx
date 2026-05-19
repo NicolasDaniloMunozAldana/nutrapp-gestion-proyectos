@@ -147,29 +147,54 @@ export const PersonalHero = ({ member, showRating }: PersonalHeroProps) => {
           <HeroKPI
             icon={
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="#64748B" strokeWidth="1.6" />
+                <path d="M12 7v5l3 2" stroke="#64748B" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+            }
+            iconBg="#F1F5F9"
+            label="Por hacer"
+            value={member.counts.porHacer ?? 0}
+          />
+          <HeroKPI
+            icon={
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="9" stroke="#2563EB" strokeWidth="1.8" />
                 <path d="M12 7v5l3 2" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" />
               </svg>
             }
             iconBg="#EFF6FF"
             label="En curso"
-            value={member.counts.enCurso}
+            value={member.counts.enCurso ?? 0}
           />
           <HeroKPI
             icon={
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M5 19c2-7 9-15 14-15-1 7-8 14-15 15M9 15c1.5.5 2.5 1.5 3 3"
-                  stroke="#8B5CF6"
-                  strokeWidth="1.6"
-                  strokeLinejoin="round"
-                />
-                <circle cx="14" cy="10" r="1.6" fill="#8B5CF6" />
+                <path d="M5 12 12 5l7 7-7 7-7-7z" stroke="#22D3EE" strokeWidth="1.6" />
+              </svg>
+            }
+            iconBg="#ECFEFF"
+            label="Despliegue DEV"
+            value={member.counts.despliegueDev ?? 0}
+          />
+          <HeroKPI
+            icon={
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M5 12 12 5l7 7-7 7-7-7z" stroke="#8B5CF6" strokeWidth="1.6" />
               </svg>
             }
             iconBg="#F5F3FF"
-            label="En despliegue"
-            value={member.counts.despliegue}
+            label="Despliegue QA"
+            value={member.counts.despliegueQa ?? 0}
+          />
+          <HeroKPI
+            icon={
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M5 12 12 5l7 7-7 7-7-7z" stroke="#EC4899" strokeWidth="1.6" />
+              </svg>
+            }
+            iconBg="#FDF2F8"
+            label="Despliegue PROD"
+            value={member.counts.despliegueProd ?? 0}
           />
           <HeroKPI
             icon={
@@ -184,7 +209,23 @@ export const PersonalHero = ({ member, showRating }: PersonalHeroProps) => {
             }
             iconBg="#FFF7ED"
             label="Detenidos"
-            value={member.counts.detenidos}
+            value={member.counts.detenidos ?? 0}
+          />
+          <HeroKPI
+            icon={
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 3l8 4v5c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V7l8-4z"
+                  stroke="#D97706"
+                  strokeWidth="1.6"
+                  strokeLinejoin="round"
+                />
+                <path d="M9 12l2 2 4-4" stroke="#D97706" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            }
+            iconBg="#FFFBEB"
+            label="Esperando aprob."
+            value={member.counts.esperandoAprobacion ?? 0}
           />
           <HeroKPI
             icon={

@@ -21,8 +21,8 @@ const items = (b: PriorityCategorizedProps['buckets']) => [
   },
   {
     id: 'deploy10',
-    label: 'En despliegue > 10 días',
-    sub: 'Tickets en despliegue por más de 10 días',
+    label: 'Despliegue > 10 días',
+    sub: 'Tickets en cualquier despliegue por más de 10 días',
     color: '#F59E0B',
     n: b.deploy10,
     icon: '↗',

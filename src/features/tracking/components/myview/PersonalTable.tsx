@@ -30,10 +30,16 @@ const tdStyle: CSSProperties = {
 };
 
 const statusPill = (estado: string, teamId: string | null, teamName: string | null) => {
+  if (estado === 'Por hacer') return <Pill tone="neutral" dot>Por hacer</Pill>;
   if (estado === 'En curso') return <Pill tone="blue" dot>En curso</Pill>;
-  if (estado === 'En despliegue')
+  if (
+    estado === 'Despliegue a DEV' ||
+    estado === 'Despliegue a QA' ||
+    estado === 'Despliegue a PROD'
+  )
     return <Pill tone="deploy" dot>{estadoDisplayLabel(estado, teamId, teamName)}</Pill>;
   if (estado === 'Detenido') return <Pill tone="danger" dot>Detenido</Pill>;
+  if (estado === 'Esperando aprobación') return <Pill tone="warn" dot>Esperando aprob.</Pill>;
   return <Pill tone="neutral" dot>{estado}</Pill>;
 };
 

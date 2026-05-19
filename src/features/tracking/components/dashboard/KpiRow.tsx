@@ -114,6 +114,12 @@ const KPI = ({
 export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
   const previewCap = 6;
   void showRating;
+  // Defensive defaults: a cached older snapshot (pre-refresh) might lack the
+  // new fields. Default to 0 / [] so the cards never render blank.
+  const n = (v: number | undefined | null): number => (typeof v === 'number' ? v : 0);
+  const arr = (v: number[] | undefined | null): number[] => (Array.isArray(v) ? v : []);
+  const t = kpis.trends ?? ({} as TrackingKpisDto['trends']);
+  const d = kpis.deltas ?? ({} as TrackingKpisDto['deltas']);
   return (
     <div
       style={{
@@ -179,20 +185,51 @@ export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
         }
       />
       <KPI
+        label="Por hacer"
+        value={n(kpis.porHacer)}
+        delta={n(d.porHacer)}
+        deltaLabel="vs ayer"
+        icon={
+          <svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" stroke="#64748B" strokeWidth="1.6" />
+            <path d="M12 7v5l3 2" stroke="#64748B" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
+        }
+        iconBg="#F1F5F9"
+        iconColor="#475569"
+        trend={arr(t.porHacer)}
+        trendColor="#94A3B8"
+      />
+      <KPI
         label="En curso"
-        value={kpis.enCurso}
-        delta={kpis.deltas.enCurso}
+        value={n(kpis.enCurso)}
+        delta={n(d.enCurso)}
         deltaLabel="vs ayer"
         icon={<Icon.spark width={18} height={18} />}
         iconBg="#EFF6FF"
         iconColor="#2563EB"
-        trend={kpis.trends.enCurso}
+        trend={arr(t.enCurso)}
         trendColor="#2563EB"
       />
       <KPI
-        label="En despliegue"
-        value={kpis.despliegue}
-        delta={kpis.deltas.despliegue}
+        label="Despliegue a DEV"
+        value={n(kpis.despliegueDev)}
+        delta={n(d.despliegueDev)}
+        deltaLabel="vs ayer"
+        icon={
+          <svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+            <path d="M5 12 12 5l7 7-7 7-7-7z" stroke="#22D3EE" strokeWidth="1.6" />
+          </svg>
+        }
+        iconBg="#ECFEFF"
+        iconColor="#0E7490"
+        trend={arr(t.despliegueDev)}
+        trendColor="#22D3EE"
+      />
+      <KPI
+        label="Despliegue a QA"
+        value={n(kpis.despliegueQa)}
+        delta={n(d.despliegueQa)}
         deltaLabel="vs ayer"
         icon={
           <svg width={18} height={18} viewBox="0 0 24 24" fill="none">
@@ -200,21 +237,36 @@ export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
           </svg>
         }
         iconBg="#F5F3FF"
-        iconColor="#8B5CF6"
-        trend={kpis.trends.despliegue}
+        iconColor="#6D28D9"
+        trend={arr(t.despliegueQa)}
         trendColor="#8B5CF6"
+      />
+      <KPI
+        label="Despliegue a PROD"
+        value={n(kpis.despliegueProd)}
+        delta={n(d.despliegueProd)}
+        deltaLabel="vs ayer"
+        icon={
+          <svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+            <path d="M5 12 12 5l7 7-7 7-7-7z" stroke="#EC4899" strokeWidth="1.6" />
+          </svg>
+        }
+        iconBg="#FDF2F8"
+        iconColor="#BE185D"
+        trend={arr(t.despliegueProd)}
+        trendColor="#EC4899"
         footer={
-          kpis.despliegueOver10 > 0 ? (
+          n(kpis.despliegueOver10) > 0 ? (
             <Pill tone="danger" dot>
-              {kpis.despliegueOver10} sobre 10 días
+              {n(kpis.despliegueOver10)} sobre 10 días
             </Pill>
           ) : null
         }
       />
       <KPI
         label="Detenidos"
-        value={kpis.detenidos}
-        delta={kpis.deltas.detenidos}
+        value={n(kpis.detenidos)}
+        delta={n(d.detenidos)}
         deltaLabel="vs ayer"
         icon={
           <svg width={18} height={18} viewBox="0 0 24 24" fill="none">
@@ -224,13 +276,34 @@ export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
         }
         iconBg="#FEF2F2"
         iconColor="#EF4444"
-        trend={kpis.trends.detenidos}
+        trend={arr(t.detenidos)}
         trendColor="#EF4444"
       />
       <KPI
+        label="Esperando aprobación"
+        value={n(kpis.esperandoAprobacion)}
+        delta={n(d.esperandoAprobacion)}
+        deltaLabel="vs ayer"
+        icon={
+          <svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 3l8 4v5c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V7l8-4z"
+              stroke="#D97706"
+              strokeWidth="1.6"
+              strokeLinejoin="round"
+            />
+            <path d="M9 12l2 2 4-4" stroke="#D97706" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        }
+        iconBg="#FFFBEB"
+        iconColor="#B45309"
+        trend={arr(t.esperandoAprobacion)}
+        trendColor="#F59E0B"
+      />
+      <KPI
         label="Completados"
-        value={kpis.completados}
-        delta={kpis.deltas.completados}
+        value={n(kpis.completados)}
+        delta={n(d.completados)}
         deltaLabel="en rango"
         icon={
           <svg width={18} height={18} viewBox="0 0 24 24" fill="none">
@@ -239,7 +312,7 @@ export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
         }
         iconBg="#DCFCE7"
         iconColor="#22C55E"
-        trend={kpis.trends.completados}
+        trend={arr(t.completados)}
         trendColor="#22C55E"
       />
       {showRating && kpis.ratingAvg !== null && (

@@ -7,12 +7,17 @@ const isGranada = (teamId: string | null | undefined, teamName: string | null | 
   return !!teamName && /granada/i.test(teamName);
 };
 
+const isDeployEstado = (estado: string): boolean =>
+  estado === 'Despliegue a DEV' ||
+  estado === 'Despliegue a QA' ||
+  estado === 'Despliegue a PROD' ||
+  estado === 'En despliegue';
+
 export const estadoDisplayLabel = (
   estado: string,
   teamId: string | null | undefined,
   teamName: string | null | undefined = null,
 ): string => {
-  if (estado === 'En despliegue' && isGranada(teamId, teamName)) return 'En Aprobación';
-  if (estado === 'En despliegue') return 'Despliegue';
+  if (isDeployEstado(estado) && isGranada(teamId, teamName)) return 'En Aprobación';
   return estado;
 };

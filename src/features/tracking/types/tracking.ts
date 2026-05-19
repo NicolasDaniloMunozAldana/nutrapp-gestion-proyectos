@@ -6,12 +6,21 @@ export type TrackingTeamsSource =
   | 'unavailable';
 
 export type TrackingEstado =
-  | 'En curso'
-  | 'En despliegue'
-  | 'Detenido'
-  | 'Completado'
   | 'Por hacer'
+  | 'En curso'
+  | 'Despliegue a DEV'
+  | 'Despliegue a QA'
+  | 'Despliegue a PROD'
+  | 'Detenido'
+  | 'Esperando aprobación'
+  | 'Completado'
   | string;
+
+export const isDespliegueEstado = (e: TrackingEstado): boolean =>
+  e === 'Despliegue a DEV' || e === 'Despliegue a QA' || e === 'Despliegue a PROD';
+
+export const isFinalEstado = (e: TrackingEstado): boolean =>
+  e === 'Completado' || e === 'Esperando aprobación';
 
 export type TrackingAlerta = 'vencido' | 'deploy>10' | 'riesgo' | null;
 
@@ -42,9 +51,14 @@ export interface TrackingMemberSummaryDto extends TrackingMemberRef {
   online: boolean;
   rating: number | null;
   counts: {
+    porHacer: number;
     enCurso: number;
     despliegue: number;
+    despliegueDev: number;
+    despliegueQa: number;
+    despliegueProd: number;
     detenidos: number;
+    esperandoAprobacion: number;
     completados: number;
     total: number;
   };
@@ -64,9 +78,14 @@ export interface TrackingTeamLoadDto {
 
 export interface TrackingKpisDto {
   personas: number;
+  porHacer: number;
   enCurso: number;
   despliegue: number;
+  despliegueDev: number;
+  despliegueQa: number;
+  despliegueProd: number;
   detenidos: number;
+  esperandoAprobacion: number;
   completados: number;
   totalTickets: number;
   despliegueOver10: number;
@@ -77,17 +96,27 @@ export interface TrackingKpisDto {
     coveragePct: number;
   };
   trends: {
+    porHacer: number[];
     enCurso: number[];
     despliegue: number[];
+    despliegueDev: number[];
+    despliegueQa: number[];
+    despliegueProd: number[];
     detenidos: number[];
+    esperandoAprobacion: number[];
     completados: number[];
     total: number[];
     rating: number[];
   };
   deltas: {
+    porHacer: number;
     enCurso: number;
     despliegue: number;
+    despliegueDev: number;
+    despliegueQa: number;
+    despliegueProd: number;
     detenidos: number;
+    esperandoAprobacion: number;
     completados: number;
     total: number;
     rating: number;
