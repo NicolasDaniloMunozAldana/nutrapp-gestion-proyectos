@@ -2,6 +2,7 @@ import { Card } from '../shared/Card';
 import { Avatar } from '../shared/Avatar';
 import { Stars } from '../shared/Stars';
 import { Semaforo } from '../shared/Semaforo';
+import { GRANADA_TEAM_ID } from '../shared/estadoLabel';
 import type { TrackingMemberSummaryDto } from '../../types/tracking';
 
 interface MemberCardProps {
@@ -29,6 +30,10 @@ const Stat = ({ n, l, c }: { n: number; l: string; c: string }) => (
 );
 
 export const MemberCard = ({ member, onSelect, showRating }: MemberCardProps) => {
+  const isGranada =
+    member.teamId === GRANADA_TEAM_ID ||
+    (!!member.teamName && /granada/i.test(member.teamName));
+  const deployLabel = isGranada ? 'Aprob.' : 'Deploy';
   return (
     <Card
       padding={16}
@@ -68,7 +73,7 @@ export const MemberCard = ({ member, onSelect, showRating }: MemberCardProps) =>
         }}
       >
         <Stat n={member.counts.enCurso} l="Curso" c="#2563EB" />
-        <Stat n={member.counts.despliegue} l="Deploy" c="#8B5CF6" />
+        <Stat n={member.counts.despliegue} l={deployLabel} c="#8B5CF6" />
         <Stat n={member.counts.detenidos} l="Stop" c="#EF4444" />
         <Stat n={member.counts.completados} l="Done" c="#22C55E" />
         <Stat n={member.counts.total} l="Total" c="#0F172A" />

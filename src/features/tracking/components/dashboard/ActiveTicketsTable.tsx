@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import { Card } from '../shared/Card';
 import { Pill } from '../shared/Pill';
 import { Avatar } from '../shared/Avatar';
+import { estadoDisplayLabel } from '../shared/estadoLabel';
 import { trackingTokens } from '../../styles/tokens';
 import type { TrackingActiveTicketDto } from '../../types/tracking';
 
@@ -28,9 +29,17 @@ const tdStyle: CSSProperties = {
   verticalAlign: 'middle',
 };
 
-const estadoPill = (estado: string) => {
+const truncateCell: CSSProperties = {
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  maxWidth: 0,
+};
+
+const estadoPill = (estado: string, teamId: string | null, teamName: string | null) => {
   if (estado === 'En curso') return <Pill tone="blue" dot>En curso</Pill>;
-  if (estado === 'En despliegue') return <Pill tone="deploy" dot>Despliegue</Pill>;
+  if (estado === 'En despliegue')
+    return <Pill tone="deploy" dot>{estadoDisplayLabel(estado, teamId, teamName)}</Pill>;
   if (estado === 'Detenido') return <Pill tone="danger" dot>Detenido</Pill>;
   return <Pill tone="neutral" dot>{estado}</Pill>;
 };
@@ -47,11 +56,12 @@ const diasCell = (t: TrackingActiveTicketDto) => {
         fontSize: 13,
         color: '#0F172A',
         fontWeight: 500,
+        whiteSpace: 'nowrap',
       }}
     >
-      <span style={{ width: 8, height: 8, borderRadius: 999, background: c }} />
+      <span style={{ width: 8, height: 8, borderRadius: 999, background: c, flex: 'none' }} />
       {t.dias}d
-      <span style={{ color: '#94A3B8', fontWeight: 500 }}>/ SLA {t.sla}d</span>
+      <span style={{ color: '#94A3B8', fontWeight: 500 }}>/ {t.sla}d</span>
     </span>
   );
 };
@@ -70,16 +80,18 @@ export const ActiveTicketsTable = ({ tickets, onSelectMember }: ActiveTicketsTab
     );
   }
   return (
-    <Card padding={0}>
+    <Card padding={0} style={{ overflow: 'hidden' }}>
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          gap: 12,
           padding: '18px 20px 14px',
+          flexWrap: 'wrap',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
           <h2 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: '#0F172A' }}>
             Tickets activos
           </h2>
@@ -105,31 +117,41 @@ export const ActiveTicketsTable = ({ tickets, onSelectMember }: ActiveTicketsTab
           Limitado al scope de los 4 equipos
         </span>
       </div>
-      <div style={{ overflowX: 'auto' }}>
+      <div style={{ width: '100%', overflowX: 'auto' }}>
         <table
           style={{
             width: '100%',
-            minWidth: 1050,
+            minWidth: 720,
             borderCollapse: 'separate',
             borderSpacing: 0,
             fontSize: 13,
+            tableLayout: 'fixed',
           }}
         >
+          <colgroup>
+            <col style={{ width: 96 }} />
+            <col />
+            <col style={{ width: 180 }} />
+            <col style={{ width: 140 }} />
+            <col style={{ width: 116 }} />
+            <col style={{ width: 96 }} />
+            <col style={{ width: 110 }} />
+          </colgroup>
           <thead>
             <tr>
-              <th style={{ ...thStyle, width: 90 }}>Jira</th>
+              <th style={thStyle}>Jira</th>
               <th style={thStyle}>Resumen</th>
-              <th style={{ ...thStyle, width: 160 }}>Responsable</th>
-              <th style={{ ...thStyle, width: 140 }}>Equipo</th>
-              <th style={{ ...thStyle, width: 110 }}>Estado</th>
-              <th style={{ ...thStyle, width: 130 }}>Días</th>
-              <th style={{ ...thStyle, width: 120 }}>Comentarios</th>
+              <th style={thStyle}>Responsable</th>
+              <th style={thStyle}>Equipo</th>
+              <th style={thStyle}>Estado</th>
+              <th style={thStyle}>Días</th>
+              <th style={thStyle}>Comentarios</th>
             </tr>
           </thead>
           <tbody>
             {tickets.map((t) => (
               <tr key={t.key}>
-                <td style={tdStyle}>
+                <td style={{ ...tdStyle, ...truncateCell }}>
                   <a
                     href={t.url}
                     target="_blank"
@@ -147,21 +169,20 @@ export const ActiveTicketsTable = ({ tickets, onSelectMember }: ActiveTicketsTab
                 <td
                   style={{
                     ...tdStyle,
+                    ...truncateCell,
                     color: '#0F172A',
                     fontWeight: 500,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
                   }}
                   title={t.summary}
                 >
                   {t.summary}
                 </td>
-                <td style={tdStyle}>
+                <td style={{ ...tdStyle, ...truncateCell }}>
                   {t.owner.accountId ? (
                     <button
                       type="button"
                       onClick={() => onSelectMember(t.owner.accountId)}
+                      title={t.owner.name}
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -172,23 +193,42 @@ export const ActiveTicketsTable = ({ tickets, onSelectMember }: ActiveTicketsTab
                         padding: 0,
                         color: '#0F172A',
                         fontWeight: 500,
+                        maxWidth: '100%',
+                        overflow: 'hidden',
                       }}
                     >
                       <Avatar user={t.owner} size={24} hideStatus />
-                      <span style={{ fontSize: 12.5 }}>{t.owner.name}</span>
+                      <span
+                        style={{
+                          fontSize: 12.5,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {t.owner.name}
+                      </span>
                     </button>
                   ) : (
                     <span style={{ color: '#94A3B8' }}>Sin asignar</span>
                   )}
                 </td>
-                <td style={{ ...tdStyle, color: '#475569', fontWeight: 500 }}>
+                <td
+                  style={{
+                    ...tdStyle,
+                    ...truncateCell,
+                    color: '#475569',
+                    fontWeight: 500,
+                  }}
+                  title={t.teamName ?? ''}
+                >
                   {t.teamName ?? '—'}
                 </td>
-                <td style={tdStyle}>{estadoPill(t.estado)}</td>
+                <td style={tdStyle}>{estadoPill(t.estado, t.teamId, t.teamName)}</td>
                 <td style={tdStyle}>{diasCell(t)}</td>
                 <td style={tdStyle}>
                   {t.estado === 'En curso' ? (
-                    <span style={{ fontSize: 12.5, color: '#0F172A', fontWeight: 600 }}>
+                    <span style={{ fontSize: 12.5, color: '#0F172A', fontWeight: 600, whiteSpace: 'nowrap' }}>
                       {t.actualComments}
                       <span style={{ color: '#94A3B8', fontWeight: 500 }}>
                         {' '}

@@ -104,6 +104,7 @@ export interface TrackingPriorityTicketDto {
   estado: TrackingEstado;
   dias: number;
   sla: number;
+  duedate: string | null;
   alerta: TrackingAlerta;
   diario: TrackingDiario;
   prioridad: string;
@@ -158,6 +159,7 @@ export interface TrackingActiveTicketDto {
   estado: TrackingEstado;
   dias: number;
   sla: number;
+  duedate: string | null;
   alerta: TrackingAlerta;
   diario: TrackingDiario;
   prioridad: string;
@@ -172,6 +174,8 @@ export interface TrackingTicketDetailDto {
   estado: TrackingEstado;
   dias: number;
   sla: number;
+  duedate: string | null;
+  fechaEntregaReal: string | null;
   diario: TrackingDiario;
   ultimo: string | null;
   alerta: TrackingAlerta;

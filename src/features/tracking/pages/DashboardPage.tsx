@@ -58,12 +58,23 @@ const SectionHeader = ({
 
 const toISODate = (d: Date): string => d.toISOString().slice(0, 10);
 
+const defaultRange = (): { from: string; to: string } => {
+  const now = new Date();
+  const start = new Date(now);
+  start.setDate(now.getDate() - 30);
+  return { from: toISODate(start), to: toISODate(now) };
+};
+
+type FilterPreset = 'today' | '7d' | '30d' | 'sprint' | null;
+
 export const DashboardPage = () => {
   const navigate = useNavigate();
+  const initialRange = useMemo(defaultRange, []);
   const [teamId, setTeamId] = useState<string>('');
-  const [from, setFrom] = useState<string>('');
-  const [to, setTo] = useState<string>('');
+  const [from, setFrom] = useState<string>(initialRange.from);
+  const [to, setTo] = useState<string>(initialRange.to);
   const [priorities, setPriorities] = useState<string[]>([]);
+  const [activePreset, setActivePreset] = useState<FilterPreset>('30d');
 
   const filters: TrackingFilters = useMemo(
     () => ({
@@ -99,12 +110,14 @@ export const DashboardPage = () => {
     if (preset === 'clear') {
       setFrom('');
       setTo('');
+      setActivePreset(null);
       return;
     }
     if (preset === 'today') {
       const d = toISODate(now);
       setFrom(d);
       setTo(d);
+      setActivePreset('today');
       return;
     }
     const days = preset === '7d' ? 7 : preset === '30d' ? 30 : 14;
@@ -112,6 +125,16 @@ export const DashboardPage = () => {
     start.setDate(now.getDate() - days);
     setFrom(toISODate(start));
     setTo(toISODate(now));
+    setActivePreset(preset);
+  };
+
+  const handleFromChange = (v: string) => {
+    setFrom(v);
+    setActivePreset(null);
+  };
+  const handleToChange = (v: string) => {
+    setTo(v);
+    setActivePreset(null);
   };
 
   const subtitle = (
@@ -148,18 +171,31 @@ export const DashboardPage = () => {
           gap: 18,
         }}
       >
-        <FiltersBar
-          teamOptions={teamOptions}
-          teamId={teamId}
-          onTeamChange={setTeamId}
-          priorities={priorities}
-          onPrioritiesChange={setPriorities}
-          from={from}
-          to={to}
-          onFromChange={setFrom}
-          onToChange={setTo}
-          onPreset={handlePreset}
-        />
+        <div
+          style={{
+            position: 'sticky',
+            top: 112,
+            zIndex: 4,
+            background: '#F8FAFC',
+            padding: '4px 0 8px',
+            marginTop: -4,
+            boxShadow: '0 6px 12px -10px rgba(15,23,42,0.18)',
+          }}
+        >
+          <FiltersBar
+            teamOptions={teamOptions}
+            teamId={teamId}
+            onTeamChange={setTeamId}
+            priorities={priorities}
+            onPrioritiesChange={setPriorities}
+            from={from}
+            to={to}
+            onFromChange={handleFromChange}
+            onToChange={handleToChange}
+            onPreset={handlePreset}
+            activePreset={activePreset}
+          />
+        </div>
 
         {error && (
           <div

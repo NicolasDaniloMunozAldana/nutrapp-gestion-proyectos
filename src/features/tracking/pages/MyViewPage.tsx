@@ -23,14 +23,25 @@ const PRIORITY_OPTIONS = ['Crítica', 'Alta', 'Media', 'Baja'];
 
 const toISODate = (d: Date): string => d.toISOString().slice(0, 10);
 
+const defaultRange = (): { from: string; to: string } => {
+  const now = new Date();
+  const start = new Date(now);
+  start.setDate(now.getDate() - 30);
+  return { from: toISODate(start), to: toISODate(now) };
+};
+
+type FilterPreset = 'today' | '7d' | '30d' | null;
+
 export const MyViewPage = () => {
   const { accountId: routeAccountId } = useParams<{ accountId?: string }>();
   const navigate = useNavigate();
   const { data: teams } = useTeams();
 
-  const [from, setFrom] = useState<string>('');
-  const [to, setTo] = useState<string>('');
+  const initialRange = useMemo(defaultRange, []);
+  const [from, setFrom] = useState<string>(initialRange.from);
+  const [to, setTo] = useState<string>(initialRange.to);
   const [priorities, setPriorities] = useState<string[]>([]);
+  const [activePreset, setActivePreset] = useState<FilterPreset>('30d');
 
   const filters: TrackingFilters = useMemo(
     () => ({
@@ -76,12 +87,14 @@ export const MyViewPage = () => {
     if (preset === 'clear') {
       setFrom('');
       setTo('');
+      setActivePreset(null);
       return;
     }
     if (preset === 'today') {
       const d = toISODate(now);
       setFrom(d);
       setTo(d);
+      setActivePreset('today');
       return;
     }
     const days = preset === '7d' ? 7 : 30;
@@ -89,6 +102,7 @@ export const MyViewPage = () => {
     start.setDate(now.getDate() - days);
     setFrom(toISODate(start));
     setTo(toISODate(now));
+    setActivePreset(preset);
   };
 
   const rightSlot = (
@@ -128,6 +142,17 @@ export const MyViewPage = () => {
         {activeAccountId && (
           <div
             style={{
+              position: 'sticky',
+              top: 112,
+              zIndex: 4,
+              background: trackingTokens.bg.app,
+              padding: '4px 0 8px',
+              marginTop: -4,
+              boxShadow: '0 6px 12px -10px rgba(15,23,42,0.18)',
+            }}
+          >
+          <div
+            style={{
               display: 'flex',
               flexWrap: 'wrap',
               alignItems: 'center',
@@ -144,7 +169,10 @@ export const MyViewPage = () => {
               <input
                 type="date"
                 value={from}
-                onChange={(e) => setFrom(e.target.value)}
+                onChange={(e) => {
+                  setFrom(e.target.value);
+                  setActivePreset(null);
+                }}
                 style={{
                   height: 34,
                   borderRadius: 10,
@@ -157,7 +185,10 @@ export const MyViewPage = () => {
               <input
                 type="date"
                 value={to}
-                onChange={(e) => setTo(e.target.value)}
+                onChange={(e) => {
+                  setTo(e.target.value);
+                  setActivePreset(null);
+                }}
                 style={{
                   height: 34,
                   borderRadius: 10,
@@ -168,25 +199,28 @@ export const MyViewPage = () => {
               />
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
-              {(['today', '7d', '30d', 'clear'] as const).map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => handlePreset(p)}
-                  style={{
-                    padding: '5px 10px',
-                    borderRadius: 999,
-                    fontSize: 12,
-                    fontWeight: 600,
-                    background: '#F1F5F9',
-                    color: '#475569',
-                    border: 'none',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {p === 'today' ? 'Hoy' : p === '7d' ? '7d' : p === '30d' ? '30d' : 'Limpiar'}
-                </button>
-              ))}
+              {(['today', '7d', '30d', 'clear'] as const).map((p) => {
+                const active = p !== 'clear' && activePreset === p;
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => handlePreset(p)}
+                    style={{
+                      padding: '5px 10px',
+                      borderRadius: 999,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      background: active ? '#0F172A' : '#F1F5F9',
+                      color: active ? '#fff' : '#475569',
+                      border: 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {p === 'today' ? 'Hoy' : p === '7d' ? '7d' : p === '30d' ? '30d' : 'Limpiar'}
+                  </button>
+                );
+              })}
             </div>
             <div
               style={{
@@ -221,6 +255,7 @@ export const MyViewPage = () => {
                 );
               })}
             </div>
+          </div>
           </div>
         )}
 
@@ -328,7 +363,11 @@ export const MyViewPage = () => {
                 coveragePct={detail.metrics.commentsCoveragePct}
               />
             </div>
-            <PersonalTable tickets={detail.tickets} />
+            <PersonalTable
+              tickets={detail.tickets}
+              teamId={detail.member.teamId}
+              teamName={detail.member.teamName}
+            />
             <CompletadosSection tickets={detail.completed} />
             <ProximosVencimientos upcoming={detail.upcoming} />
           </>

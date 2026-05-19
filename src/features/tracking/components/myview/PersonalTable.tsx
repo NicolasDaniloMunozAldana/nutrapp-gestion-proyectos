@@ -1,11 +1,14 @@
 import type { CSSProperties } from 'react';
 import { Card } from '../shared/Card';
 import { Pill } from '../shared/Pill';
+import { estadoDisplayLabel } from '../shared/estadoLabel';
 import { trackingTokens } from '../../styles/tokens';
 import type { TrackingTicketDetailDto } from '../../types/tracking';
 
 interface PersonalTableProps {
   tickets: TrackingTicketDetailDto[];
+  teamId: string | null;
+  teamName: string | null;
 }
 
 const thStyle: CSSProperties = {
@@ -26,18 +29,38 @@ const tdStyle: CSSProperties = {
   verticalAlign: 'middle',
 };
 
-const statusPill = (estado: string) => {
+const statusPill = (estado: string, teamId: string | null, teamName: string | null) => {
   if (estado === 'En curso') return <Pill tone="blue" dot>En curso</Pill>;
-  if (estado === 'En despliegue') return <Pill tone="deploy" dot>Despliegue</Pill>;
+  if (estado === 'En despliegue')
+    return <Pill tone="deploy" dot>{estadoDisplayLabel(estado, teamId, teamName)}</Pill>;
   if (estado === 'Detenido') return <Pill tone="danger" dot>Detenido</Pill>;
   return <Pill tone="neutral" dot>{estado}</Pill>;
 };
 
-const slaPill = (t: TrackingTicketDetailDto) => {
-  if (t.dias > t.sla) return <Pill tone="danger">Vencido</Pill>;
-  if (t.estado === 'Detenido') return <Pill tone="danger">Bloqueado</Pill>;
-  if (t.dias / t.sla >= 0.85) return <Pill tone="warn">Riesgo</Pill>;
-  return <Pill tone="ok">OK</Pill>;
+// Returns today's calendar date in Colombia timezone as a YYYY-MM-DD string,
+// so we can compare it lexicographically with the date-only values that come
+// from Jira (duedate / customfield_10513).
+const todayInColombia = (): string =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(new Date());
+
+const normalizeDate = (raw: string | null | undefined): string | null => {
+  if (!raw) return null;
+  const s = String(raw).trim();
+  if (!s) return null;
+  // Both "2026-04-08" and "2026-04-08T...-05:00" reduce to the same prefix.
+  return s.slice(0, 10);
+};
+
+const estadoVencimientoPill = (t: TrackingTicketDetailDto) => {
+  const due = normalizeDate(t.duedate);
+  const entrega = normalizeDate(t.fechaEntregaReal);
+  if (!due) return <Pill tone="neutral">Sin fecha</Pill>;
+  if (entrega) {
+    if (entrega <= due) return <Pill tone="ok">OK</Pill>;
+    return <Pill tone="danger">Entrega vencida</Pill>;
+  }
+  if (due < todayInColombia()) return <Pill tone="danger">Vencida</Pill>;
+  return <Pill tone="ok">En plazo</Pill>;
 };
 
 const diarioPill = (d: string) => {
@@ -69,9 +92,10 @@ const prioPill = (p: string) => {
 
 const alertaCell = (t: TrackingTicketDetailDto) => {
   if (t.alerta === 'deploy>10') return <Pill tone="danger" dot>+10 días</Pill>;
-  if (t.alerta === 'vencido') return <Pill tone="danger">SLA vencido</Pill>;
+  if (t.alerta === 'vencido') return <Pill tone="danger">Vencido</Pill>;
   if (t.alerta === 'riesgo') return <Pill tone="warn" dot>Próx. a vencer</Pill>;
   if (t.estado === 'Detenido') return <Pill tone="danger">Requiere acción</Pill>;
+  if (!t.duedate) return <Pill tone="neutral">Sin fecha de vencimiento</Pill>;
   return <span style={{ color: '#CBD5E1', fontSize: 12 }}>—</span>;
 };
 
@@ -95,13 +119,13 @@ const diasCell = (t: TrackingTicketDetailDto) => {
   );
 };
 
-export const PersonalTable = ({ tickets }: PersonalTableProps) => {
+export const PersonalTable = ({ tickets, teamId, teamName }: PersonalTableProps) => {
   const headers = [
     { id: 'key', label: 'Jira', w: 80 },
     { id: 'resumen', label: 'Resumen', w: undefined },
     { id: 'estado', label: 'Estado', w: 108 },
     { id: 'dias', label: 'Días en estado', w: 132 },
-    { id: 'sla', label: 'SLA', w: 96 },
+    { id: 'vencimiento', label: 'Estado vencimiento', w: 152 },
     { id: 'ultimo', label: 'Último comentario', w: 200 },
     { id: 'diario', label: 'Comentario diario', w: 132 },
     { id: 'prio', label: 'Prioridad', w: 100 },
@@ -199,9 +223,9 @@ export const PersonalTable = ({ tickets }: PersonalTableProps) => {
                 >
                   {t.summary}
                 </td>
-                <td style={tdStyle}>{statusPill(t.estado)}</td>
+                <td style={tdStyle}>{statusPill(t.estado, teamId, teamName)}</td>
                 <td style={tdStyle}>{diasCell(t)}</td>
-                <td style={tdStyle}>{slaPill(t)}</td>
+                <td style={tdStyle}>{estadoVencimientoPill(t)}</td>
                 <td style={tdStyle}>
                   <div style={{ fontSize: 12.5, color: '#0F172A', fontWeight: 600 }}>
                     {t.ultimo ?? 'Sin comentarios'}
@@ -241,7 +265,7 @@ export const PersonalTable = ({ tickets }: PersonalTableProps) => {
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <span style={{ width: 8, height: 8, borderRadius: 999, background: '#EF4444' }} />
-            10+ días (Vencido / Bloqueado)
+            10+ días en estado
           </span>
         </div>
         <span>

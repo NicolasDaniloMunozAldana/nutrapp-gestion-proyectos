@@ -1,6 +1,8 @@
 import type { CSSProperties } from 'react';
 import { trackingTokens } from '../../styles/tokens';
 
+type FilterPreset = 'today' | '7d' | '30d' | 'sprint' | null;
+
 interface FiltersBarProps {
   teamOptions: Array<{ id: string; name: string }>;
   teamId: string;
@@ -12,6 +14,7 @@ interface FiltersBarProps {
   onFromChange: (v: string) => void;
   onToChange: (v: string) => void;
   onPreset: (preset: 'today' | '7d' | '30d' | 'sprint' | 'clear') => void;
+  activePreset?: FilterPreset;
 }
 
 const PRIORITY_OPTIONS = ['Crítica', 'Alta', 'Media', 'Baja'];
@@ -51,6 +54,7 @@ export const FiltersBar = ({
   onFromChange,
   onToChange,
   onPreset,
+  activePreset = null,
 }: FiltersBarProps) => {
   const togglePriority = (p: string) => {
     const lower = p.toLowerCase();
@@ -98,7 +102,12 @@ export const FiltersBar = ({
       </div>
       <div style={{ display: 'flex', gap: 6 }}>
         {(['today', '7d', '30d', 'sprint', 'clear'] as const).map((p) => (
-          <button key={p} type="button" onClick={() => onPreset(p)} style={chipStyle(false)}>
+          <button
+            key={p}
+            type="button"
+            onClick={() => onPreset(p)}
+            style={chipStyle(p !== 'clear' && activePreset === p)}
+          >
             {p === 'today' ? 'Hoy' : p === '7d' ? '7d' : p === '30d' ? '30d' : p === 'sprint' ? 'Sprint' : 'Limpiar'}
           </button>
         ))}
