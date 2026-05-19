@@ -1,10 +1,25 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Card } from '../shared/Card';
 import { Pill } from '../shared/Pill';
 import { Sparkline } from '../shared/Sparkline';
 import { Stars } from '../shared/Stars';
 import { Icon } from '../shared/icons';
+import { localAvatarUrl } from '../shared/Avatar';
 import type { TrackingKpisDto, TrackingMemberSummaryDto } from '../../types/tracking';
+
+const MiniAvatar = ({ member }: { member: TrackingMemberSummaryDto }) => {
+  const [failed, setFailed] = useState(false);
+  const src = localAvatarUrl(member.accountId);
+  if (!src || failed) return <>{member.initials}</>;
+  return (
+    <img
+      src={src}
+      alt={member.name}
+      onError={() => setFailed(true)}
+      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+    />
+  );
+};
 
 interface KpiRowProps {
   kpis: TrackingKpisDto;
@@ -137,11 +152,7 @@ export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
                   overflow: 'hidden',
                 }}
               >
-                {m.avatar ? (
-                  <img src={m.avatar} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  m.initials
-                )}
+                <MiniAvatar member={m} />
               </div>
             ))}
             {membersPreview.length > previewCap && (

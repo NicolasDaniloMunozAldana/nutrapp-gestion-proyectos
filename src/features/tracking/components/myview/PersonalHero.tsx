@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Card } from '../shared/Card';
 import { Pill } from '../shared/Pill';
 import { Stars } from '../shared/Stars';
+import { localAvatarUrl } from '../shared/Avatar';
 import { colorForUser } from '../../styles/tokens';
 import type { TrackingMemberSummaryDto } from '../../types/tracking';
 
@@ -63,6 +64,9 @@ const HeroKPI = ({ icon, iconBg, label, value, last }: HeroKpiProps) => (
 export const PersonalHero = ({ member, showRating }: PersonalHeroProps) => {
   const c = colorForUser(member.accountId || member.name);
   const ratingBlock = showRating && member.rating !== null;
+  const [avatarFailed, setAvatarFailed] = useState(false);
+  const heroAvatarSrc = localAvatarUrl(member.accountId);
+  const showAvatarImg = !!heroAvatarSrc && !avatarFailed;
   return (
     <div
       style={{
@@ -110,10 +114,11 @@ export const PersonalHero = ({ member, showRating }: PersonalHeroProps) => {
                   overflow: 'hidden',
                 }}
               >
-                {member.avatar ? (
+                {showAvatarImg ? (
                   <img
-                    src={member.avatar}
+                    src={heroAvatarSrc as string}
                     alt={member.name}
+                    onError={() => setAvatarFailed(true)}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                 ) : (

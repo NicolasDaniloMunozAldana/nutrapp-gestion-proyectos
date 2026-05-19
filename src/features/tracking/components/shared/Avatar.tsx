@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { colorForUser } from '../../styles/tokens';
 import type { TrackingMemberRef } from '../../types/tracking';
 
@@ -8,15 +9,27 @@ interface AvatarProps {
   hideStatus?: boolean;
 }
 
+// Local team avatars live under public/avatars/<accountId>.webp.
+// Windows-hosted files can't contain ":" so the colon in the accountId is
+// stripped when looking up the file (e.g. "712020:14fcdaa4..." → "71202014fcdaa4...").
+export const localAvatarUrl = (accountId: string | null | undefined): string | null => {
+  if (!accountId) return null;
+  const base = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
+  return `${base}/avatars/${accountId.replace(/:/g, '')}.webp`;
+};
+
 export const Avatar = ({ user, size = 36, ring = false, hideStatus = false }: AvatarProps) => {
   const bg = colorForUser(user.accountId || user.name);
-  const useImg = !!user.avatar;
+  const [imgFailed, setImgFailed] = useState(false);
+  const localSrc = localAvatarUrl(user.accountId);
+  const useImg = !!localSrc && !imgFailed;
   return (
     <div style={{ position: 'relative', width: size, height: size, flex: 'none' }}>
       {useImg ? (
         <img
-          src={user.avatar}
+          src={localSrc as string}
           alt={user.name}
+          onError={() => setImgFailed(true)}
           style={{
             width: size,
             height: size,
