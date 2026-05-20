@@ -5,16 +5,18 @@ import { Sparkline } from '../shared/Sparkline';
 import { Stars } from '../shared/Stars';
 import { Icon } from '../shared/icons';
 import { localAvatarUrl } from '../shared/Avatar';
+import { normalizePersonName, personInitials } from '../../utils/names';
 import type { TrackingKpisDto, TrackingMemberSummaryDto } from '../../types/tracking';
 
 const MiniAvatar = ({ member }: { member: TrackingMemberSummaryDto }) => {
   const [failed, setFailed] = useState(false);
   const src = localAvatarUrl(member.accountId);
-  if (!src || failed) return <>{member.initials}</>;
+  const initials = personInitials(member.name) || member.initials;
+  if (!src || failed) return <>{initials}</>;
   return (
     <img
       src={src}
-      alt={member.name}
+      alt={normalizePersonName(member.name)}
       onError={() => setFailed(true)}
       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
     />
@@ -157,7 +159,7 @@ export const KpiRow = ({ kpis, membersPreview, showRating, onSelectEstado }: Kpi
             {membersPreview.slice(0, previewCap).map((m, i) => (
               <div
                 key={m.accountId}
-                title={m.name}
+                title={normalizePersonName(m.name)}
                 style={{
                   width: 26,
                   height: 26,

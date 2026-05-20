@@ -18,6 +18,7 @@ import { Card } from '../components/shared/Card';
 import { MemberCard } from '../components/dashboard/MemberCard';
 import { trackingTokens } from '../styles/tokens';
 import { useIsMobile } from '../hooks/useMediaQuery';
+import { normalizePersonName } from '../utils/names';
 import type { TrackingFilters } from '../types/tracking';
 
 const PRIORITY_OPTIONS = ['Crítica', 'Alta', 'Media', 'Baja'];
@@ -123,7 +124,7 @@ export const MyViewPage = () => {
       title={
         detail ? (
           <>
-            {detail.member.name}{' '}
+            {normalizePersonName(detail.member.name)}{' '}
             <span style={{ color: '#94A3B8', fontWeight: 500 }}>
               — {detail.member.teamName ?? 'Sin equipo'}
             </span>

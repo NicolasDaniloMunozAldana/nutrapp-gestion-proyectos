@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { colorForUser } from '../../styles/tokens';
+import { normalizePersonName, personInitials } from '../../utils/names';
 import type { TrackingMemberRef } from '../../types/tracking';
 
 interface AvatarProps {
@@ -19,7 +20,9 @@ export const localAvatarUrl = (accountId: string | null | undefined): string | n
 };
 
 export const Avatar = ({ user, size = 36, ring = false, hideStatus = false }: AvatarProps) => {
-  const bg = colorForUser(user.accountId || user.name);
+  const displayName = normalizePersonName(user.name) || user.name;
+  const initials = personInitials(user.name) || user.initials;
+  const bg = colorForUser(user.accountId || displayName);
   const [imgFailed, setImgFailed] = useState(false);
   const localSrc = localAvatarUrl(user.accountId);
   const useImg = !!localSrc && !imgFailed;
@@ -28,7 +31,7 @@ export const Avatar = ({ user, size = 36, ring = false, hideStatus = false }: Av
       {useImg ? (
         <img
           src={localSrc as string}
-          alt={user.name}
+          alt={displayName}
           onError={() => setImgFailed(true)}
           style={{
             width: size,
@@ -55,7 +58,7 @@ export const Avatar = ({ user, size = 36, ring = false, hideStatus = false }: Av
             letterSpacing: 0.2,
           }}
         >
-          {user.initials}
+          {initials}
         </div>
       )}
       {!hideStatus && (

@@ -4,6 +4,7 @@ import { Stars } from '../shared/Stars';
 import { MemberCard } from './MemberCard';
 import { colorForTeam } from '../../styles/tokens';
 import { useIsMobile } from '../../hooks/useMediaQuery';
+import { colorByTeamName } from '../../utils/teamColors';
 import type { TrackingTeamLoadDto } from '../../types/tracking';
 
 interface CellsBlockProps {
@@ -33,57 +34,96 @@ export const CellsBlock = ({ teams, onSelectMember, showRating }: CellsBlockProp
         gap: isMobile ? 12 : 16,
       }}
     >
-      {teams.map((t) => (
-        <Card key={t.team.id} padding={isMobile ? 14 : 20}>
-          <div
+      {teams.map((t) => {
+        const brand = colorByTeamName(t.team.name) ?? colorForTeam(t.team.id);
+        return (
+          <Card
+            key={t.team.id}
+            padding={isMobile ? 14 : 20}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: 14,
+              minWidth: 0,
+              border: `1px solid ${brand}`,
+              borderTopWidth: 2,
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 14,
+                gap: 8,
+                flexWrap: 'wrap',
+              }}
+            >
+              <div
                 style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: 3,
-                  background: colorForTeam(t.team.id),
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  minWidth: 0,
+                  flex: 1,
                 }}
-              />
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: '#0F172A' }}>
-                {t.team.name}
-              </h3>
-              <span style={{ fontSize: 12, color: '#94A3B8', fontWeight: 500 }}>
-                · {t.members.length}
-              </span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              {t.team.rating !== null && (
-                <Stars value={t.team.rating} size={11} />
-              )}
-              <Pill tone="neutral">{t.totalEnCurso} en curso</Pill>
-            </div>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {t.members.length === 0 ? (
-              <div style={{ fontSize: 12.5, color: '#94A3B8' }}>
-                Sin miembros configurados para este equipo.
-              </div>
-            ) : (
-              t.members.map((m) => (
-                <MemberCard
-                  key={m.accountId}
-                  member={m}
-                  onSelect={onSelectMember}
-                  showRating={showRating}
+              >
+                <span
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: 3,
+                    background: brand,
+                    flex: 'none',
+                  }}
                 />
-              ))
-            )}
-          </div>
-        </Card>
-      ))}
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: isMobile ? 16 : 18,
+                    fontWeight: 600,
+                    color: '#0F172A',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    minWidth: 0,
+                  }}
+                  title={t.team.name}
+                >
+                  {t.team.name}
+                </h3>
+                <span
+                  style={{
+                    fontSize: 12,
+                    color: '#94A3B8',
+                    fontWeight: 500,
+                    flex: 'none',
+                  }}
+                >
+                  · {t.members.length}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 'none' }}>
+                {t.team.rating !== null && <Stars value={t.team.rating} size={11} />}
+                <Pill tone="neutral">{t.totalEnCurso} en curso</Pill>
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {t.members.length === 0 ? (
+                <div style={{ fontSize: 12.5, color: '#94A3B8' }}>
+                  Sin miembros configurados para este equipo.
+                </div>
+              ) : (
+                t.members.map((m) => (
+                  <MemberCard
+                    key={m.accountId}
+                    member={m}
+                    onSelect={onSelectMember}
+                    showRating={showRating}
+                  />
+                ))
+              )}
+            </div>
+          </Card>
+        );
+      })}
     </div>
   );
 };

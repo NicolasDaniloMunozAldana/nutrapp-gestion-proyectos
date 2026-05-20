@@ -5,6 +5,7 @@ import { Stars } from '../shared/Stars';
 import { localAvatarUrl } from '../shared/Avatar';
 import { colorForUser } from '../../styles/tokens';
 import { useIsMobile } from '../../hooks/useMediaQuery';
+import { normalizePersonName, personInitials } from '../../utils/names';
 import type { TrackingMemberSummaryDto } from '../../types/tracking';
 
 interface PersonalHeroProps {
@@ -121,12 +122,12 @@ export const PersonalHero = ({ member, showRating }: PersonalHeroProps) => {
                 {showAvatarImg ? (
                   <img
                     src={heroAvatarSrc as string}
-                    alt={member.name}
+                    alt={normalizePersonName(member.name)}
                     onError={() => setAvatarFailed(true)}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                 ) : (
-                  member.initials
+                  personInitials(member.name) || member.initials
                 )}
               </div>
             </div>
@@ -139,7 +140,7 @@ export const PersonalHero = ({ member, showRating }: PersonalHeroProps) => {
                   letterSpacing: -0.2,
                 }}
               >
-                {member.name}
+                {normalizePersonName(member.name)}
               </div>
               <div
                 style={{ fontSize: 12, color: '#94A3B8', fontWeight: 500, marginTop: 2 }}

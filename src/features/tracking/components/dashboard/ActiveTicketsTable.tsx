@@ -5,6 +5,7 @@ import { Avatar } from '../shared/Avatar';
 import { estadoDisplayLabel } from '../shared/estadoLabel';
 import { trackingTokens } from '../../styles/tokens';
 import { useIsMobile } from '../../hooks/useMediaQuery';
+import { normalizePersonName } from '../../utils/names';
 import type { TrackingActiveTicketDto } from '../../types/tracking';
 
 interface ActiveTicketsTableProps {
@@ -189,7 +190,7 @@ export const ActiveTicketsTable = ({ tickets, onSelectMember }: ActiveTicketsTab
                   <button
                     type="button"
                     onClick={() => onSelectMember(t.owner.accountId)}
-                    title={t.owner.name}
+                    title={normalizePersonName(t.owner.name)}
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -213,7 +214,7 @@ export const ActiveTicketsTable = ({ tickets, onSelectMember }: ActiveTicketsTab
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {t.owner.name}
+                      {normalizePersonName(t.owner.name)}
                     </span>
                   </button>
                 ) : (
@@ -299,7 +300,7 @@ export const ActiveTicketsTable = ({ tickets, onSelectMember }: ActiveTicketsTab
                     <button
                       type="button"
                       onClick={() => onSelectMember(t.owner.accountId)}
-                      title={t.owner.name}
+                      title={normalizePersonName(t.owner.name)}
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -323,7 +324,7 @@ export const ActiveTicketsTable = ({ tickets, onSelectMember }: ActiveTicketsTab
                           textOverflow: 'ellipsis',
                         }}
                       >
-                        {t.owner.name}
+                        {normalizePersonName(t.owner.name)}
                       </span>
                     </button>
                   ) : (

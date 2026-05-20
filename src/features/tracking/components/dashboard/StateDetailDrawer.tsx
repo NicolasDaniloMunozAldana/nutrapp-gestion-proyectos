@@ -4,6 +4,7 @@ import { Avatar } from '../shared/Avatar';
 import { trackingTokens } from '../../styles/tokens';
 import { useIssuesByEstado } from '../../hooks/useIssuesByEstado';
 import { useIsMobile } from '../../hooks/useMediaQuery';
+import { normalizePersonName } from '../../utils/names';
 import type { TrackingFilters, TrackingIssueListItemDto } from '../../types/tracking';
 
 interface StateDetailDrawerProps {
@@ -215,7 +216,7 @@ const Body = ({
                   <button
                     type="button"
                     onClick={() => onSelectMember && onSelectMember(t.owner.accountId)}
-                    title={t.owner.name}
+                    title={normalizePersonName(t.owner.name)}
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -239,7 +240,7 @@ const Body = ({
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {t.owner.name}
+                      {normalizePersonName(t.owner.name)}
                     </span>
                   </button>
                 ) : (
@@ -336,7 +337,7 @@ const Body = ({
                       onClick={() =>
                         onSelectMember && onSelectMember(t.owner.accountId)
                       }
-                      title={t.owner.name}
+                      title={normalizePersonName(t.owner.name)}
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -360,7 +361,7 @@ const Body = ({
                           textOverflow: 'ellipsis',
                         }}
                       >
-                        {t.owner.name}
+                        {normalizePersonName(t.owner.name)}
                       </span>
                     </button>
                   ) : (

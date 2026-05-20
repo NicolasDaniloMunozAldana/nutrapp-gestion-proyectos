@@ -3,6 +3,7 @@ import { Avatar } from '../shared/Avatar';
 import { Icon } from '../shared/icons';
 import { trackingTokens } from '../../styles/tokens';
 import { useIsMobile } from '../../hooks/useMediaQuery';
+import { normalizePersonName } from '../../utils/names';
 import type { TrackingTeamLoadDto } from '../../types/tracking';
 
 interface MemberSwitcherProps {
@@ -61,7 +62,7 @@ export const MemberSwitcher = ({ teams, currentAccountId, onSelect }: MemberSwit
                 minWidth: 0,
               }}
             >
-              {current.name}
+              {normalizePersonName(current.name)}
             </span>
           </>
         ) : (
@@ -153,7 +154,7 @@ export const MemberSwitcher = ({ teams, currentAccountId, onSelect }: MemberSwit
                       textOverflow: 'ellipsis',
                     }}
                   >
-                    {m.name}
+                    {normalizePersonName(m.name)}
                   </div>
                   <div style={{ fontSize: 11, color: '#94A3B8' }}>
                     {m.teamName ?? 'Sin equipo'} · {m.counts.total} tickets

@@ -1,6 +1,7 @@
 import { Card } from '../shared/Card';
 import { Avatar } from '../shared/Avatar';
 import { Stars } from '../shared/Stars';
+import { normalizePersonName } from '../../utils/names';
 import type { TrackingMemberSummaryDto } from '../../types/tracking';
 
 interface RankingPanelProps {
@@ -55,8 +56,29 @@ export const RankingPanel = ({ members, onSelect }: RankingPanelProps) => {
             </div>
             <Avatar user={m} size={32} hideStatus />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, color: '#0F172A', fontWeight: 600 }}>{m.name}</div>
-              <div style={{ fontSize: 11, color: '#94A3B8' }}>{m.teamName ?? '—'}</div>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: '#0F172A',
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {normalizePersonName(m.name)}
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: '#94A3B8',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {m.teamName ?? '—'}
+              </div>
             </div>
             <div style={{ textAlign: 'right' }}>
               {m.rating !== null && <Stars value={m.rating} size={10} />}

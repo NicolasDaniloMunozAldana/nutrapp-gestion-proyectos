@@ -101,73 +101,34 @@ export const TrackingShell = ({
       }}
     >
       <SkeletonStyleTag />
-      {!isMobile && <aside
-        style={{
-          width: 88,
-          background: trackingTokens.bg.sidebar,
-          color: '#94A3B8',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          padding: '20px 0',
-          borderRight: '1px solid #1E293B',
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
-          flex: 'none',
-        }}
-      >
-        <div
+      {!isMobile && (
+        <aside
           style={{
-            width: 44,
-            height: 44,
-            borderRadius: 14,
-            background: 'linear-gradient(135deg, #2563EB 0%, #1E40AF 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow:
-              '0 6px 20px rgba(37,99,235,0.45), inset 0 0 0 1px rgba(255,255,255,0.15)',
-            marginBottom: 24,
-          }}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="#fff" strokeOpacity="0.35" strokeWidth="1.5" />
-            <circle cx="12" cy="12" r="6" stroke="#fff" strokeOpacity="0.65" strokeWidth="1.5" />
-            <circle cx="12" cy="12" r="2.5" fill="#fff" />
-          </svg>
-        </div>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
-          <NavItem to="/" label="Dashboard" active={active === 'dashboard'} icon={Icon.grid} />
-          <NavItem
-            to={location.pathname.startsWith('/mi-vista') ? location.pathname : '/mi-vista'}
-            label="Mi Vista"
-            active={active === 'mi-vista'}
-            icon={Icon.team}
-          />
-        </nav>
-        <Link
-          to="/teamboard"
-          aria-label="Ir al TeamBoard"
-          title="TeamBoard (Kanban)"
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 10,
-            background: 'rgba(255,255,255,0.06)',
+            width: 88,
+            background: trackingTokens.bg.sidebar,
             color: '#94A3B8',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
-            textDecoration: 'none',
-            fontSize: 11,
-            fontWeight: 700,
-            marginBottom: 8,
+            padding: '24px 0',
+            borderRight: '1px solid #1E293B',
+            position: 'sticky',
+            top: 0,
+            height: '100vh',
+            flex: 'none',
           }}
         >
-          TB
-        </Link>
-      </aside>}
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
+            <NavItem to="/" label="Dashboard" active={active === 'dashboard'} icon={Icon.grid} />
+            <NavItem
+              to={location.pathname.startsWith('/mi-vista') ? location.pathname : '/mi-vista'}
+              label="Mi Vista"
+              active={active === 'mi-vista'}
+              icon={Icon.team}
+            />
+          </nav>
+        </aside>
+      )}
 
       <main style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
         <header
@@ -336,7 +297,7 @@ export const TrackingShell = ({
               borderTop: `1px solid ${trackingTokens.border.soft}`,
               boxShadow: '0 -8px 20px rgba(15,23,42,0.06)',
               display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
+              gridTemplateColumns: 'repeat(2, 1fr)',
               padding: '6px 6px max(6px, env(safe-area-inset-bottom))',
               gap: 4,
             }}
@@ -353,7 +314,6 @@ export const TrackingShell = ({
               active={active === 'mi-vista'}
               icon={Icon.team}
             />
-            <MobileTab to="/teamboard" label="TeamBoard" />
           </nav>
         )}
       </main>
@@ -370,7 +330,7 @@ const MobileTab = ({
   to: string;
   label: string;
   active?: boolean;
-  icon?: (p: { width?: number; height?: number }) => ReactNode;
+  icon: (p: { width?: number; height?: number }) => ReactNode;
 }) => (
   <Link
     to={to}
@@ -391,24 +351,7 @@ const MobileTab = ({
       minHeight: 48,
     }}
   >
-    {I ? I({ width: 20, height: 20 }) : (
-      <span
-        style={{
-          width: 20,
-          height: 20,
-          borderRadius: 6,
-          background: '#E2E8F0',
-          color: '#475569',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 10,
-          fontWeight: 700,
-        }}
-      >
-        TB
-      </span>
-    )}
+    {I({ width: 20, height: 20 })}
     <span>{label}</span>
   </Link>
 );

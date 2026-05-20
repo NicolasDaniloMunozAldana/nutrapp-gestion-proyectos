@@ -3,6 +3,8 @@ import { Avatar } from '../shared/Avatar';
 import { Stars } from '../shared/Stars';
 import { Semaforo } from '../shared/Semaforo';
 import { GRANADA_TEAM_ID } from '../shared/estadoLabel';
+import { normalizePersonName } from '../../utils/names';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 import type { TrackingMemberSummaryDto } from '../../types/tracking';
 
 interface MemberCardProps {
@@ -12,7 +14,13 @@ interface MemberCardProps {
 }
 
 const Stat = ({ n, l, c }: { n: number; l: string; c: string }) => (
-  <div style={{ textAlign: 'center' }}>
+  <div
+    style={{
+      textAlign: 'center',
+      minWidth: 0,
+      padding: '2px 4px',
+    }}
+  >
     <div style={{ fontSize: 16, fontWeight: 700, color: c, lineHeight: 1 }}>{n}</div>
     <div
       style={{
@@ -22,6 +30,9 @@ const Stat = ({ n, l, c }: { n: number; l: string; c: string }) => (
         marginTop: 2,
         textTransform: 'uppercase',
         letterSpacing: 0.4,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
       }}
     >
       {l}
@@ -34,15 +45,18 @@ export const MemberCard = ({ member, onSelect, showRating }: MemberCardProps) =>
     member.teamId === GRANADA_TEAM_ID ||
     (!!member.teamName && /granada/i.test(member.teamName));
   const deployLabel = isGranada ? 'Aprob.' : 'Deploy';
+  const displayName = normalizePersonName(member.name);
+  const memberForAvatar = { ...member, name: displayName };
+  const isMobile = useIsMobile();
   return (
     <Card
       padding={16}
       hoverable
       onClick={() => onSelect(member.accountId)}
-      style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+      style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <Avatar user={member} size={42} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+        <Avatar user={memberForAvatar} size={42} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
@@ -53,10 +67,20 @@ export const MemberCard = ({ member, onSelect, showRating }: MemberCardProps) =>
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
             }}
+            title={displayName}
           >
-            {member.name}
+            {displayName}
           </div>
-          <div style={{ fontSize: 11.5, color: '#94A3B8', fontWeight: 500 }}>
+          <div
+            style={{
+              fontSize: 11.5,
+              color: '#94A3B8',
+              fontWeight: 500,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
             {member.teamName ?? 'Sin equipo'}
           </div>
         </div>
@@ -65,13 +89,17 @@ export const MemberCard = ({ member, onSelect, showRating }: MemberCardProps) =>
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(5, 1fr)',
-          gap: 4,
+          gridTemplateColumns: isMobile
+            ? 'repeat(3, minmax(0, 1fr))'
+            : 'repeat(6, minmax(0, 1fr))',
+          gap: isMobile ? 6 : 4,
+          rowGap: isMobile ? 10 : 4,
           background: '#F8FAFC',
           borderRadius: 12,
-          padding: '10px 8px',
+          padding: '10px 6px',
         }}
       >
+        <Stat n={member.counts.porHacer ?? 0} l="Por hacer" c="#64748B" />
         <Stat n={member.counts.enCurso} l="Curso" c="#2563EB" />
         <Stat n={member.counts.despliegue} l={deployLabel} c="#8B5CF6" />
         <Stat n={member.counts.detenidos} l="Stop" c="#EF4444" />
