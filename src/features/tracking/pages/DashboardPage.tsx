@@ -12,6 +12,7 @@ import { DistributionPanel } from '../components/dashboard/DistributionPanel';
 import { RankingPanel } from '../components/dashboard/RankingPanel';
 import { ActiveTicketsTable } from '../components/dashboard/ActiveTicketsTable';
 import { FiltersBar } from '../components/dashboard/FiltersBar';
+import { StateDetailDrawer } from '../components/dashboard/StateDetailDrawer';
 import { SkeletonCard } from '../components/shared/Skeleton';
 import type { TrackingFilters } from '../types/tracking';
 
@@ -75,6 +76,7 @@ export const DashboardPage = () => {
   const [to, setTo] = useState<string>(initialRange.to);
   const [priorities, setPriorities] = useState<string[]>([]);
   const [activePreset, setActivePreset] = useState<FilterPreset>('30d');
+  const [drawerEstado, setDrawerEstado] = useState<string | null>(null);
 
   const filters: TrackingFilters = useMemo(
     () => ({
@@ -257,7 +259,12 @@ export const DashboardPage = () => {
             ))}
           </div>
         ) : (
-          <KpiRow kpis={data.kpis} membersPreview={membersPreview} showRating={showRating} />
+          <KpiRow
+            kpis={data.kpis}
+            membersPreview={membersPreview}
+            showRating={showRating}
+            onSelectEstado={setDrawerEstado}
+          />
         )}
 
         <SectionHeader
@@ -349,6 +356,12 @@ export const DashboardPage = () => {
             </>
           )}
       </div>
+      <StateDetailDrawer
+        estado={drawerEstado}
+        filters={filters}
+        onClose={() => setDrawerEstado(null)}
+        onSelectMember={handleSelectMember}
+      />
     </TrackingShell>
   );
 };

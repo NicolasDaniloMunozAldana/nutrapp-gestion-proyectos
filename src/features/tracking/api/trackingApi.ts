@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type {
   TrackingFilters,
+  TrackingIssueListItemDto,
   TrackingMemberDetailDto,
   TrackingOverviewDto,
   TrackingSyncStatusDto,
@@ -29,6 +30,16 @@ export const fetchOverview = async (
 ): Promise<TrackingOverviewDto> => {
   const { data } = await client.get<TrackingOverviewDto>('/overview', {
     params: filtersToParams(filters),
+  });
+  return data;
+};
+
+export const fetchIssuesByEstado = async (
+  estado: string,
+  filters?: TrackingFilters,
+): Promise<TrackingIssueListItemDto[]> => {
+  const { data } = await client.get<TrackingIssueListItemDto[]>('/issues', {
+    params: { ...filtersToParams(filters), estado },
   });
   return data;
 };

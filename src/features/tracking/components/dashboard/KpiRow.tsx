@@ -25,6 +25,7 @@ interface KpiRowProps {
   kpis: TrackingKpisDto;
   membersPreview: TrackingMemberSummaryDto[];
   showRating: boolean;
+  onSelectEstado?: (estado: string) => void;
 }
 
 interface KpiProps {
@@ -39,6 +40,7 @@ interface KpiProps {
   iconBg: string;
   iconColor: string;
   footer?: ReactNode;
+  onClick?: () => void;
 }
 
 const KPI = ({
@@ -53,8 +55,20 @@ const KPI = ({
   iconBg,
   iconColor,
   footer,
+  onClick,
 }: KpiProps) => (
-  <Card padding={20} hoverable style={{ display: 'flex', flexDirection: 'column', gap: 14, minHeight: 168 }}>
+  <Card
+    padding={20}
+    hoverable
+    onClick={onClick}
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 14,
+      minHeight: 168,
+      cursor: onClick ? 'pointer' : undefined,
+    }}
+  >
     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
       <div style={{ fontSize: 13, color: '#64748B', fontWeight: 600 }}>{label}</div>
       <div
@@ -111,7 +125,9 @@ const KPI = ({
   </Card>
 );
 
-export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
+export const KpiRow = ({ kpis, membersPreview, showRating, onSelectEstado }: KpiRowProps) => {
+  const open = (estado: string) =>
+    onSelectEstado ? () => onSelectEstado(estado) : undefined;
   const previewCap = 6;
   void showRating;
   // Defensive defaults: a cached older snapshot (pre-refresh) might lack the
@@ -199,6 +215,7 @@ export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
         iconColor="#475569"
         trend={arr(t.porHacer)}
         trendColor="#94A3B8"
+        onClick={open('Por hacer')}
       />
       <KPI
         label="En curso"
@@ -210,6 +227,7 @@ export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
         iconColor="#2563EB"
         trend={arr(t.enCurso)}
         trendColor="#2563EB"
+        onClick={open('En curso')}
       />
       <KPI
         label="Despliegue a DEV"
@@ -225,6 +243,7 @@ export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
         iconColor="#0E7490"
         trend={arr(t.despliegueDev)}
         trendColor="#22D3EE"
+        onClick={open('Despliegue a DEV')}
       />
       <KPI
         label="Despliegue a QA"
@@ -240,6 +259,7 @@ export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
         iconColor="#6D28D9"
         trend={arr(t.despliegueQa)}
         trendColor="#8B5CF6"
+        onClick={open('Despliegue a QA')}
       />
       <KPI
         label="Despliegue a PROD"
@@ -262,6 +282,7 @@ export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
             </Pill>
           ) : null
         }
+        onClick={open('Despliegue a PROD')}
       />
       <KPI
         label="Detenidos"
@@ -278,6 +299,7 @@ export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
         iconColor="#EF4444"
         trend={arr(t.detenidos)}
         trendColor="#EF4444"
+        onClick={open('Detenido')}
       />
       <KPI
         label="Esperando aprobación"
@@ -299,6 +321,7 @@ export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
         iconColor="#B45309"
         trend={arr(t.esperandoAprobacion)}
         trendColor="#F59E0B"
+        onClick={open('Esperando aprobación')}
       />
       <KPI
         label="Completados"
@@ -314,6 +337,7 @@ export const KpiRow = ({ kpis, membersPreview, showRating }: KpiRowProps) => {
         iconColor="#22C55E"
         trend={arr(t.completados)}
         trendColor="#22C55E"
+        onClick={open('Completado')}
       />
       {showRating && kpis.ratingAvg !== null && (
         <KPI

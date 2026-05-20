@@ -178,6 +178,21 @@ export interface TrackingOverviewDto {
   teamsSource: TrackingTeamsSource;
 }
 
+export interface TrackingIssueListItemDto {
+  key: string;
+  summary: string;
+  url: string;
+  owner: TrackingMemberRef;
+  teamId: string | null;
+  teamName: string | null;
+  estado: TrackingEstado;
+  dias: number;
+  duedate: string | null;
+  fechaEntregaReal: string | null;
+  alerta: TrackingAlerta;
+  prioridad: string;
+}
+
 export interface TrackingActiveTicketDto {
   key: string;
   summary: string;
