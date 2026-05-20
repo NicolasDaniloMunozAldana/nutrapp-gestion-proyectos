@@ -3,6 +3,7 @@ import { Pill } from '../shared/Pill';
 import { Avatar } from '../shared/Avatar';
 import { trackingTokens } from '../../styles/tokens';
 import { useIssuesByEstado } from '../../hooks/useIssuesByEstado';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 import type { TrackingFilters, TrackingIssueListItemDto } from '../../types/tracking';
 
 interface StateDetailDrawerProps {
@@ -79,6 +80,7 @@ const Body = ({
     estado,
     filters,
   );
+  const isMobile = useIsMobile();
 
   if (isLoading) {
     return (
@@ -136,6 +138,121 @@ const Body = ({
       >
         No hay incidencias en estado <strong>{estado}</strong> con los filtros actuales.
       </div>
+    );
+  }
+
+  if (isMobile) {
+    return (
+      <>
+        <div
+          style={{
+            padding: '10px 16px',
+            fontSize: 12,
+            color: '#94A3B8',
+            fontWeight: 500,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
+          {data.length} ticket{data.length === 1 ? '' : 's'}
+          {isFetching && <span style={{ color: '#2563EB' }}>· actualizando…</span>}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {data.map((t) => (
+            <div
+              key={t.key}
+              style={{
+                padding: '12px 16px',
+                borderTop: '1px solid #F1F5F9',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                <a
+                  href={t.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    color: '#2563EB',
+                    fontWeight: 600,
+                    fontFamily: 'ui-monospace,monospace',
+                    textDecoration: 'none',
+                    fontSize: 12.5,
+                  }}
+                >
+                  {t.key}
+                </a>
+                {alertaPill(t.alerta)}
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: '#0F172A',
+                  fontWeight: 500,
+                  lineHeight: 1.35,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+                title={t.summary}
+              >
+                {t.summary}
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 8,
+                  flexWrap: 'wrap',
+                }}
+              >
+                {t.owner.accountId ? (
+                  <button
+                    type="button"
+                    onClick={() => onSelectMember && onSelectMember(t.owner.accountId)}
+                    title={t.owner.name}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: onSelectMember ? 'pointer' : 'default',
+                      padding: 0,
+                      color: '#0F172A',
+                      fontWeight: 500,
+                      minWidth: 0,
+                      flex: 1,
+                    }}
+                  >
+                    <Avatar user={t.owner} size={22} hideStatus />
+                    <span
+                      style={{
+                        fontSize: 12,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {t.owner.name}
+                    </span>
+                  </button>
+                ) : (
+                  <span style={{ color: '#94A3B8', fontSize: 12 }}>Sin asignar</span>
+                )}
+                <span style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>
+                  {t.dias}d · vence {formatDate(t.duedate)}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </>
     );
   }
 

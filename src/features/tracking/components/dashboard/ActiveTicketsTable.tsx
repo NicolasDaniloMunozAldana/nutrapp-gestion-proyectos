@@ -4,6 +4,7 @@ import { Pill } from '../shared/Pill';
 import { Avatar } from '../shared/Avatar';
 import { estadoDisplayLabel } from '../shared/estadoLabel';
 import { trackingTokens } from '../../styles/tokens';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 import type { TrackingActiveTicketDto } from '../../types/tracking';
 
 interface ActiveTicketsTableProps {
@@ -73,6 +74,7 @@ const diasCell = (t: TrackingActiveTicketDto) => {
 };
 
 export const ActiveTicketsTable = ({ tickets, onSelectMember }: ActiveTicketsTableProps) => {
+  const isMobile = useIsMobile();
   if (tickets.length === 0) {
     return (
       <Card padding={20}>
@@ -85,44 +87,153 @@ export const ActiveTicketsTable = ({ tickets, onSelectMember }: ActiveTicketsTab
       </Card>
     );
   }
-  return (
-    <Card padding={0} style={{ overflow: 'hidden' }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
-          padding: '18px 20px 14px',
-          flexWrap: 'wrap',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: '#0F172A' }}>
-            Tickets activos
-          </h2>
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minWidth: 22,
-              height: 22,
-              padding: '0 7px',
-              borderRadius: 999,
-              background: '#F1F5F9',
-              color: '#475569',
-              fontSize: 11.5,
-              fontWeight: 700,
-            }}
-          >
-            {tickets.length}
-          </span>
-        </div>
+  const headerBar = (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
+        padding: isMobile ? '14px 14px 10px' : '18px 20px 14px',
+        flexWrap: 'wrap',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+        <h2 style={{ margin: 0, fontSize: isMobile ? 16 : 18, fontWeight: 600, color: '#0F172A' }}>
+          Tickets activos
+        </h2>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minWidth: 22,
+            height: 22,
+            padding: '0 7px',
+            borderRadius: 999,
+            background: '#F1F5F9',
+            color: '#475569',
+            fontSize: 11.5,
+            fontWeight: 700,
+          }}
+        >
+          {tickets.length}
+        </span>
+      </div>
+      {!isMobile && (
         <span style={{ fontSize: 11.5, color: '#94A3B8', fontWeight: 500 }}>
           Limitado al scope de los 4 equipos
         </span>
-      </div>
+      )}
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <Card padding={0} style={{ overflow: 'hidden' }}>
+        {headerBar}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {tickets.map((t) => (
+            <div
+              key={t.key}
+              style={{
+                padding: '12px 14px',
+                borderTop: '1px solid #F1F5F9',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                <a
+                  href={t.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    color: '#2563EB',
+                    fontWeight: 600,
+                    fontFamily: 'ui-monospace,monospace',
+                    textDecoration: 'none',
+                    fontSize: 12.5,
+                  }}
+                >
+                  {t.key}
+                </a>
+                {estadoPill(t.estado, t.teamId, t.teamName)}
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: '#0F172A',
+                  fontWeight: 500,
+                  lineHeight: 1.35,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+                title={t.summary}
+              >
+                {t.summary}
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 8,
+                  flexWrap: 'wrap',
+                }}
+              >
+                {t.owner.accountId ? (
+                  <button
+                    type="button"
+                    onClick={() => onSelectMember(t.owner.accountId)}
+                    title={t.owner.name}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                      color: '#0F172A',
+                      fontWeight: 500,
+                      minWidth: 0,
+                      flex: 1,
+                    }}
+                  >
+                    <Avatar user={t.owner} size={22} hideStatus />
+                    <span
+                      style={{
+                        fontSize: 12,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {t.owner.name}
+                    </span>
+                  </button>
+                ) : (
+                  <span style={{ color: '#94A3B8', fontSize: 12 }}>Sin asignar</span>
+                )}
+                {diasCell(t)}
+              </div>
+              <div style={{ fontSize: 11.5, color: '#94A3B8' }} title={t.teamName ?? ''}>
+                {t.teamName ?? '—'}
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    );
+  }
+
+  return (
+    <Card padding={0} style={{ overflow: 'hidden' }}>
+      {headerBar}
       <div style={{ width: '100%', overflowX: 'auto' }}>
         <table
           style={{

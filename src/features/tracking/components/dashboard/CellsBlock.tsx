@@ -3,6 +3,7 @@ import { Pill } from '../shared/Pill';
 import { Stars } from '../shared/Stars';
 import { MemberCard } from './MemberCard';
 import { colorForTeam } from '../../styles/tokens';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 import type { TrackingTeamLoadDto } from '../../types/tracking';
 
 interface CellsBlockProps {
@@ -12,6 +13,7 @@ interface CellsBlockProps {
 }
 
 export const CellsBlock = ({ teams, onSelectMember, showRating }: CellsBlockProps) => {
+  const isMobile = useIsMobile();
   if (teams.length === 0) {
     return (
       <Card padding={24}>
@@ -27,12 +29,12 @@ export const CellsBlock = ({ teams, onSelectMember, showRating }: CellsBlockProp
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-        gap: 16,
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(320px, 1fr))',
+        gap: isMobile ? 12 : 16,
       }}
     >
       {teams.map((t) => (
-        <Card key={t.team.id} padding={20}>
+        <Card key={t.team.id} padding={isMobile ? 14 : 20}>
           <div
             style={{
               display: 'flex',

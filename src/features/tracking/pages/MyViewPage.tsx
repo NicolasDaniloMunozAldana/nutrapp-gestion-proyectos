@@ -17,6 +17,7 @@ import { SkeletonCard } from '../components/shared/Skeleton';
 import { Card } from '../components/shared/Card';
 import { MemberCard } from '../components/dashboard/MemberCard';
 import { trackingTokens } from '../styles/tokens';
+import { useIsMobile } from '../hooks/useMediaQuery';
 import type { TrackingFilters } from '../types/tracking';
 
 const PRIORITY_OPTIONS = ['Crítica', 'Alta', 'Media', 'Baja'];
@@ -42,6 +43,9 @@ export const MyViewPage = () => {
   const [to, setTo] = useState<string>(initialRange.to);
   const [priorities, setPriorities] = useState<string[]>([]);
   const [activePreset, setActivePreset] = useState<FilterPreset>('30d');
+  const isMobile = useIsMobile();
+  const stickyTop = isMobile ? 92 : 112;
+  const contentPadding = isMobile ? '12px 12px 32px' : '20px 32px 40px';
 
   const filters: TrackingFilters = useMemo(
     () => ({
@@ -133,17 +137,17 @@ export const MyViewPage = () => {
     >
       <div
         style={{
-          padding: '20px 32px 40px',
+          padding: contentPadding,
           display: 'flex',
           flexDirection: 'column',
-          gap: 16,
+          gap: isMobile ? 12 : 16,
         }}
       >
         {activeAccountId && (
           <div
             style={{
               position: 'sticky',
-              top: 112,
+              top: stickyTop,
               zIndex: 4,
               background: trackingTokens.bg.app,
               padding: '4px 0 8px',
@@ -153,9 +157,10 @@ export const MyViewPage = () => {
           >
           <div
             style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
+              display: isMobile ? 'grid' : 'flex',
+              gridTemplateColumns: isMobile ? '1fr' : undefined,
+              flexWrap: isMobile ? undefined : 'wrap',
+              alignItems: isMobile ? 'stretch' : 'center',
               gap: 12,
               padding: '12px 16px',
               background: '#fff',
@@ -164,41 +169,85 @@ export const MyViewPage = () => {
               boxShadow: trackingTokens.shadow.soft,
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <label style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>Desde</label>
-              <input
-                type="date"
-                value={from}
-                onChange={(e) => {
-                  setFrom(e.target.value);
-                  setActivePreset(null);
-                }}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                alignItems: 'center',
+                gap: 8,
+                minWidth: 0,
+              }}
+            >
+              <label
                 style={{
-                  height: 34,
-                  borderRadius: 10,
-                  border: `1px solid ${trackingTokens.border.soft}`,
-                  padding: '0 10px',
-                  fontSize: 13,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 4,
+                  fontSize: 11,
+                  color: '#64748B',
+                  fontWeight: 600,
+                  minWidth: 0,
                 }}
-              />
-              <label style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>Hasta</label>
-              <input
-                type="date"
-                value={to}
-                onChange={(e) => {
-                  setTo(e.target.value);
-                  setActivePreset(null);
-                }}
+              >
+                Desde
+                <input
+                  type="date"
+                  value={from}
+                  onChange={(e) => {
+                    setFrom(e.target.value);
+                    setActivePreset(null);
+                  }}
+                  style={{
+                    height: isMobile ? 40 : 34,
+                    borderRadius: 10,
+                    border: `1px solid ${trackingTokens.border.soft}`,
+                    padding: '0 10px',
+                    fontSize: 13,
+                    width: '100%',
+                    minWidth: 0,
+                  }}
+                />
+              </label>
+              <label
                 style={{
-                  height: 34,
-                  borderRadius: 10,
-                  border: `1px solid ${trackingTokens.border.soft}`,
-                  padding: '0 10px',
-                  fontSize: 13,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 4,
+                  fontSize: 11,
+                  color: '#64748B',
+                  fontWeight: 600,
+                  minWidth: 0,
                 }}
-              />
+              >
+                Hasta
+                <input
+                  type="date"
+                  value={to}
+                  onChange={(e) => {
+                    setTo(e.target.value);
+                    setActivePreset(null);
+                  }}
+                  style={{
+                    height: isMobile ? 40 : 34,
+                    borderRadius: 10,
+                    border: `1px solid ${trackingTokens.border.soft}`,
+                    padding: '0 10px',
+                    fontSize: 13,
+                    width: '100%',
+                    minWidth: 0,
+                  }}
+                />
+              </label>
             </div>
-            <div style={{ display: 'flex', gap: 6 }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: 6,
+                overflowX: isMobile ? 'auto' : 'visible',
+                WebkitOverflowScrolling: 'touch',
+                paddingBottom: isMobile ? 2 : 0,
+              }}
+            >
               {(['today', '7d', '30d', 'clear'] as const).map((p) => {
                 const active = p !== 'clear' && activePreset === p;
                 return (
@@ -207,7 +256,8 @@ export const MyViewPage = () => {
                     type="button"
                     onClick={() => handlePreset(p)}
                     style={{
-                      padding: '5px 10px',
+                      padding: isMobile ? '8px 12px' : '5px 10px',
+                      minHeight: isMobile ? 36 : 'auto',
                       borderRadius: 999,
                       fontSize: 12,
                       fontWeight: 600,
@@ -215,6 +265,7 @@ export const MyViewPage = () => {
                       color: active ? '#fff' : '#475569',
                       border: 'none',
                       cursor: 'pointer',
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     {p === 'today' ? 'Hoy' : p === '7d' ? '7d' : p === '30d' ? '30d' : 'Limpiar'}
@@ -227,11 +278,16 @@ export const MyViewPage = () => {
                 display: 'flex',
                 gap: 6,
                 alignItems: 'center',
-                marginLeft: 'auto',
-                flexWrap: 'wrap',
+                marginLeft: isMobile ? 0 : 'auto',
+                flexWrap: isMobile ? 'nowrap' : 'wrap',
+                overflowX: isMobile ? 'auto' : 'visible',
+                WebkitOverflowScrolling: 'touch',
+                paddingBottom: isMobile ? 2 : 0,
               }}
             >
-              <span style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>Prioridad:</span>
+              <span style={{ fontSize: 12, color: '#64748B', fontWeight: 600, flex: 'none' }}>
+                Prioridad:
+              </span>
               {PRIORITY_OPTIONS.map((p) => {
                 const active = priorities.some((x) => x.toLowerCase() === p.toLowerCase());
                 return (
@@ -240,7 +296,8 @@ export const MyViewPage = () => {
                     type="button"
                     onClick={() => togglePriority(p)}
                     style={{
-                      padding: '5px 10px',
+                      padding: isMobile ? '8px 12px' : '5px 10px',
+                      minHeight: isMobile ? 36 : 'auto',
                       borderRadius: 999,
                       fontSize: 12,
                       fontWeight: 600,
@@ -248,6 +305,7 @@ export const MyViewPage = () => {
                       color: active ? '#fff' : '#475569',
                       border: 'none',
                       cursor: 'pointer',
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     {p}

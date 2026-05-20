@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Avatar } from '../shared/Avatar';
 import { Icon } from '../shared/icons';
 import { trackingTokens } from '../../styles/tokens';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 import type { TrackingTeamLoadDto } from '../../types/tracking';
 
 interface MemberSwitcherProps {
@@ -13,6 +14,7 @@ interface MemberSwitcherProps {
 export const MemberSwitcher = ({ teams, currentAccountId, onSelect }: MemberSwitcherProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const isMobile = useIsMobile();
 
   const all = useMemo(() => teams.flatMap((t) => t.members), [teams]);
   const current = all.find((m) => m.accountId === currentAccountId) ?? null;
@@ -35,7 +37,7 @@ export const MemberSwitcher = ({ teams, currentAccountId, onSelect }: MemberSwit
         style={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: 10,
+          gap: 8,
           padding: '8px 12px',
           borderRadius: 12,
           background: trackingTokens.bg.card,
@@ -44,17 +46,28 @@ export const MemberSwitcher = ({ teams, currentAccountId, onSelect }: MemberSwit
           fontWeight: 600,
           fontSize: 13,
           cursor: 'pointer',
+          maxWidth: isMobile ? 200 : 320,
+          minHeight: 40,
         }}
       >
         {current ? (
           <>
             <Avatar user={current} size={24} hideStatus />
-            <span>{current.name}</span>
+            <span
+              style={{
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                minWidth: 0,
+              }}
+            >
+              {current.name}
+            </span>
           </>
         ) : (
           <span>Selecciona integrante</span>
         )}
-        <span style={{ color: '#94A3B8' }}>▾</span>
+        <span style={{ color: '#94A3B8', flex: 'none' }}>▾</span>
       </button>
       {open && (
         <div
@@ -63,7 +76,7 @@ export const MemberSwitcher = ({ teams, currentAccountId, onSelect }: MemberSwit
             right: 0,
             top: 'calc(100% + 6px)',
             zIndex: 60,
-            width: 320,
+            width: isMobile ? 'min(86vw, 320px)' : 320,
             maxHeight: 360,
             overflow: 'auto',
             background: trackingTokens.bg.card,

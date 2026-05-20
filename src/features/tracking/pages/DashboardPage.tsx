@@ -14,6 +14,7 @@ import { ActiveTicketsTable } from '../components/dashboard/ActiveTicketsTable';
 import { FiltersBar } from '../components/dashboard/FiltersBar';
 import { StateDetailDrawer } from '../components/dashboard/StateDetailDrawer';
 import { SkeletonCard } from '../components/shared/Skeleton';
+import { useIsMobile, useIsTablet } from '../hooks/useMediaQuery';
 import type { TrackingFilters } from '../types/tracking';
 
 const SectionHeader = ({
@@ -77,6 +78,10 @@ export const DashboardPage = () => {
   const [priorities, setPriorities] = useState<string[]>([]);
   const [activePreset, setActivePreset] = useState<FilterPreset>('30d');
   const [drawerEstado, setDrawerEstado] = useState<string | null>(null);
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  const stickyTop = isMobile ? 92 : 112;
+  const contentPadding = isMobile ? '12px 12px 32px' : '20px 32px 40px';
 
   const filters: TrackingFilters = useMemo(
     () => ({
@@ -167,16 +172,16 @@ export const DashboardPage = () => {
     >
       <div
         style={{
-          padding: '20px 32px 40px',
+          padding: contentPadding,
           display: 'flex',
           flexDirection: 'column',
-          gap: 18,
+          gap: isMobile ? 14 : 18,
         }}
       >
         <div
           style={{
             position: 'sticky',
-            top: 112,
+            top: stickyTop,
             zIndex: 4,
             background: '#F8FAFC',
             padding: '4px 0 8px',
@@ -299,8 +304,8 @@ export const DashboardPage = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
-              gap: 16,
+              gridTemplateColumns: isTablet ? '1fr' : 'repeat(auto-fit, minmax(380px, 1fr))',
+              gap: isMobile ? 12 : 16,
             }}
           >
             <PriorityPanel tickets={data.priority} />
@@ -343,8 +348,8 @@ export const DashboardPage = () => {
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                  gap: 16,
+                  gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(320px, 1fr))',
+                  gap: isMobile ? 12 : 16,
                 }}
               >
                 <HeatmapPanel rows={data.heatmap} />

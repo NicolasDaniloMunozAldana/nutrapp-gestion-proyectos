@@ -4,6 +4,7 @@ import { Pill } from '../shared/Pill';
 import { Stars } from '../shared/Stars';
 import { localAvatarUrl } from '../shared/Avatar';
 import { colorForUser } from '../../styles/tokens';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 import type { TrackingMemberSummaryDto } from '../../types/tracking';
 
 interface PersonalHeroProps {
@@ -67,6 +68,7 @@ export const PersonalHero = ({ member, showRating }: PersonalHeroProps) => {
   const [avatarFailed, setAvatarFailed] = useState(false);
   const heroAvatarSrc = localAvatarUrl(member.accountId);
   const showAvatarImg = !!heroAvatarSrc && !avatarFailed;
+  const isMobile = useIsMobile();
   return (
     <div
       style={{
@@ -81,7 +83,9 @@ export const PersonalHero = ({ member, showRating }: PersonalHeroProps) => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(200px, 240px) repeat(auto-fit, minmax(140px, 1fr))',
+            gridTemplateColumns: isMobile
+              ? '1fr'
+              : 'minmax(200px, 240px) repeat(auto-fit, minmax(140px, 1fr))',
             alignItems: 'stretch',
           }}
         >

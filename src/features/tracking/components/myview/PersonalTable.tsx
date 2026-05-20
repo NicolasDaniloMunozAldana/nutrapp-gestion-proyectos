@@ -3,6 +3,7 @@ import { Card } from '../shared/Card';
 import { Pill } from '../shared/Pill';
 import { estadoDisplayLabel } from '../shared/estadoLabel';
 import { trackingTokens } from '../../styles/tokens';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 import type { TrackingTicketDetailDto } from '../../types/tracking';
 
 interface PersonalTableProps {
@@ -126,6 +127,7 @@ const diasCell = (t: TrackingTicketDetailDto) => {
 };
 
 export const PersonalTable = ({ tickets, teamId, teamName }: PersonalTableProps) => {
+  const isMobile = useIsMobile();
   const headers = [
     { id: 'key', label: 'Jira', w: 80 },
     { id: 'resumen', label: 'Resumen', w: undefined },
@@ -138,39 +140,156 @@ export const PersonalTable = ({ tickets, teamId, teamName }: PersonalTableProps)
     { id: 'alerta', label: 'Alerta', w: 132 },
   ];
 
-  return (
-    <Card padding={0}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '18px 20px 14px',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: '#0F172A' }}>
-            Detalle de tickets
-          </h2>
-          <span
+  const headerBar = (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: isMobile ? '14px 14px 10px' : '18px 20px 14px',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <h2 style={{ margin: 0, fontSize: isMobile ? 16 : 18, fontWeight: 600, color: '#0F172A' }}>
+          Detalle de tickets
+        </h2>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minWidth: 22,
+            height: 22,
+            padding: '0 7px',
+            borderRadius: 999,
+            background: '#F1F5F9',
+            color: '#475569',
+            fontSize: 11.5,
+            fontWeight: 700,
+          }}
+        >
+          {tickets.length}
+        </span>
+      </div>
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <Card padding={0}>
+        {headerBar}
+        {tickets.length === 0 ? (
+          <div
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minWidth: 22,
-              height: 22,
-              padding: '0 7px',
-              borderRadius: 999,
-              background: '#F1F5F9',
-              color: '#475569',
-              fontSize: 11.5,
-              fontWeight: 700,
+              padding: '20px 14px',
+              fontSize: 13,
+              color: '#94A3B8',
+              textAlign: 'center',
             }}
           >
-            {tickets.length}
-          </span>
-        </div>
-      </div>
+            Este integrante no tiene tickets activos.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {tickets.map((t) => (
+              <div
+                key={t.key}
+                style={{
+                  padding: '12px 14px',
+                  borderTop: '1px solid #F1F5F9',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8,
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                  }}
+                >
+                  <a
+                    href={t.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      color: '#2563EB',
+                      fontWeight: 600,
+                      fontFamily: 'ui-monospace,monospace',
+                      textDecoration: 'none',
+                      fontSize: 12.5,
+                    }}
+                  >
+                    {t.key}
+                  </a>
+                  {statusPill(t.estado, teamId, teamName)}
+                </div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: '#0F172A',
+                    fontWeight: 500,
+                    lineHeight: 1.35,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}
+                  title={t.summary}
+                >
+                  {t.summary}
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  {diasCell(t)}
+                  {estadoVencimientoPill(t)}
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <span style={{ fontSize: 12, color: '#64748B' }}>
+                    Último: <span style={{ color: '#0F172A', fontWeight: 600 }}>{t.ultimo ?? 'Sin comentarios'}</span>
+                  </span>
+                  {diarioPill(t.diario)}
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  {prioPill(t.prioridad)}
+                  {alertaCell(t)}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+    );
+  }
+
+  return (
+    <Card padding={0}>
+      {headerBar}
       <div style={{ overflowX: 'auto' }}>
         <table
           style={{

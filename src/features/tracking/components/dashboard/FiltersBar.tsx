@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import { trackingTokens } from '../../styles/tokens';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 
 type FilterPreset = 'today' | '7d' | '30d' | 'sprint' | null;
 
@@ -19,8 +20,8 @@ interface FiltersBarProps {
 
 const PRIORITY_OPTIONS = ['Crítica', 'Alta', 'Media', 'Baja'];
 
-const fieldStyle: CSSProperties = {
-  height: 36,
+const fieldStyle = (isMobile: boolean): CSSProperties => ({
+  height: isMobile ? 40 : 36,
   borderRadius: 10,
   border: `1px solid ${trackingTokens.border.soft}`,
   background: '#fff',
@@ -28,12 +29,16 @@ const fieldStyle: CSSProperties = {
   fontSize: 13,
   padding: '0 10px',
   fontWeight: 600,
-};
+  minWidth: 0,
+  width: '100%',
+});
 
-const chipStyle = (active: boolean): CSSProperties => ({
+const chipStyle = (active: boolean, isMobile: boolean): CSSProperties => ({
   display: 'inline-flex',
   alignItems: 'center',
-  padding: '5px 10px',
+  justifyContent: 'center',
+  padding: isMobile ? '8px 12px' : '5px 10px',
+  minHeight: isMobile ? 36 : 'auto',
   borderRadius: 999,
   fontSize: 12,
   fontWeight: 600,
@@ -41,6 +46,7 @@ const chipStyle = (active: boolean): CSSProperties => ({
   background: active ? '#0F172A' : '#F1F5F9',
   color: active ? '#fff' : '#475569',
   border: 'none',
+  whiteSpace: 'nowrap',
 });
 
 export const FiltersBar = ({
@@ -56,27 +62,34 @@ export const FiltersBar = ({
   onPreset,
   activePreset = null,
 }: FiltersBarProps) => {
+  const isMobile = useIsMobile();
   const togglePriority = (p: string) => {
     const lower = p.toLowerCase();
     const exists = priorities.some((x) => x.toLowerCase() === lower);
     if (exists) onPrioritiesChange(priorities.filter((x) => x.toLowerCase() !== lower));
     else onPrioritiesChange([...priorities, p]);
   };
+  const field = fieldStyle(isMobile);
   return (
     <div
       style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        gap: 12,
-        padding: '12px 16px',
+        display: isMobile ? 'grid' : 'flex',
+        gridTemplateColumns: isMobile ? '1fr' : undefined,
+        flexWrap: isMobile ? undefined : 'wrap',
+        alignItems: isMobile ? 'stretch' : 'center',
+        gap: isMobile ? 10 : 12,
+        padding: isMobile ? '12px' : '12px 16px',
         background: '#fff',
         borderRadius: 14,
         border: `1px solid ${trackingTokens.border.soft}`,
         boxShadow: trackingTokens.shadow.soft,
       }}
     >
-      <select value={teamId} onChange={(e) => onTeamChange(e.target.value)} style={fieldStyle}>
+      <select
+        value={teamId}
+        onChange={(e) => onTeamChange(e.target.value)}
+        style={field}
+      >
         <option value="">Todos los equipos</option>
         {teamOptions.map((t) => (
           <option key={t.id} value={t.id}>
@@ -84,29 +97,69 @@ export const FiltersBar = ({
           </option>
         ))}
       </select>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <label style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>Desde</label>
-        <input
-          type="date"
-          value={from}
-          onChange={(e) => onFromChange(e.target.value)}
-          style={fieldStyle}
-        />
-        <label style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>Hasta</label>
-        <input
-          type="date"
-          value={to}
-          onChange={(e) => onToChange(e.target.value)}
-          style={fieldStyle}
-        />
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          alignItems: 'center',
+          gap: 8,
+          minWidth: isMobile ? 0 : 240,
+        }}
+      >
+        <label
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+            fontSize: 11,
+            color: '#64748B',
+            fontWeight: 600,
+            minWidth: 0,
+          }}
+        >
+          Desde
+          <input
+            type="date"
+            value={from}
+            onChange={(e) => onFromChange(e.target.value)}
+            style={field}
+          />
+        </label>
+        <label
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+            fontSize: 11,
+            color: '#64748B',
+            fontWeight: 600,
+            minWidth: 0,
+          }}
+        >
+          Hasta
+          <input
+            type="date"
+            value={to}
+            onChange={(e) => onToChange(e.target.value)}
+            style={field}
+          />
+        </label>
       </div>
-      <div style={{ display: 'flex', gap: 6 }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 6,
+          overflowX: isMobile ? 'auto' : 'visible',
+          WebkitOverflowScrolling: 'touch',
+          paddingBottom: isMobile ? 2 : 0,
+        }}
+      >
         {(['today', '7d', '30d', 'sprint', 'clear'] as const).map((p) => (
           <button
             key={p}
             type="button"
             onClick={() => onPreset(p)}
-            style={chipStyle(p !== 'clear' && activePreset === p)}
+            style={chipStyle(p !== 'clear' && activePreset === p, isMobile)}
           >
             {p === 'today' ? 'Hoy' : p === '7d' ? '7d' : p === '30d' ? '30d' : p === 'sprint' ? 'Sprint' : 'Limpiar'}
           </button>
@@ -117,15 +170,32 @@ export const FiltersBar = ({
           display: 'flex',
           gap: 6,
           alignItems: 'center',
-          marginLeft: 'auto',
-          flexWrap: 'wrap',
+          marginLeft: isMobile ? 0 : 'auto',
+          flexWrap: isMobile ? 'nowrap' : 'wrap',
+          overflowX: isMobile ? 'auto' : 'visible',
+          WebkitOverflowScrolling: 'touch',
+          paddingBottom: isMobile ? 2 : 0,
         }}
       >
-        <span style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>Prioridad:</span>
+        <span
+          style={{
+            fontSize: 12,
+            color: '#64748B',
+            fontWeight: 600,
+            flex: 'none',
+          }}
+        >
+          Prioridad:
+        </span>
         {PRIORITY_OPTIONS.map((p) => {
           const active = priorities.some((x) => x.toLowerCase() === p.toLowerCase());
           return (
-            <button key={p} type="button" onClick={() => togglePriority(p)} style={chipStyle(active)}>
+            <button
+              key={p}
+              type="button"
+              onClick={() => togglePriority(p)}
+              style={chipStyle(active, isMobile)}
+            >
               {p}
             </button>
           );

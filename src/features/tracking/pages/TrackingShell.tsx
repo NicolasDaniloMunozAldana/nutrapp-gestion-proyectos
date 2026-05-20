@@ -4,6 +4,7 @@ import { Icon } from '../components/shared/icons';
 import { Pill } from '../components/shared/Pill';
 import { trackingTokens } from '../styles/tokens';
 import { useSyncRefresh, useSyncStatus } from '../hooks/useTrackingSync';
+import { useIsMobile } from '../hooks/useMediaQuery';
 import { SkeletonStyleTag } from '../components/shared/Skeleton';
 
 interface TrackingShellProps {
@@ -78,6 +79,7 @@ export const TrackingShell = ({
   const refresh = useSyncRefresh();
   const location = useLocation();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const lastSyncText = status?.lastSyncAt
     ? new Date(status.lastSyncAt).toLocaleTimeString('es-CO', {
@@ -99,7 +101,7 @@ export const TrackingShell = ({
       }}
     >
       <SkeletonStyleTag />
-      <aside
+      {!isMobile && <aside
         style={{
           width: 88,
           background: trackingTokens.bg.sidebar,
@@ -165,16 +167,16 @@ export const TrackingShell = ({
         >
           TB
         </Link>
-      </aside>
+      </aside>}
 
       <main style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
         <header
           style={{
             display: 'flex',
-            alignItems: 'flex-end',
+            alignItems: isMobile ? 'flex-start' : 'flex-end',
             justifyContent: 'space-between',
-            padding: '24px 32px 16px',
-            gap: 16,
+            padding: isMobile ? '14px 16px 12px' : '24px 32px 16px',
+            gap: isMobile ? 8 : 16,
             borderBottom: `1px solid ${trackingTokens.border.soft}`,
             background: 'rgba(248,250,252,0.92)',
             backdropFilter: 'blur(8px)',
@@ -184,12 +186,20 @@ export const TrackingShell = ({
             flexWrap: 'wrap',
           }}
         >
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                marginBottom: 6,
+                flexWrap: 'wrap',
+              }}
+            >
               <Pill tone="blue" dot>
                 {sourceLabel[teamsSource] ?? teamsSource}
               </Pill>
-              {status?.teams.count !== undefined && (
+              {status?.teams.count !== undefined && !isMobile && (
                 <span style={{ color: '#94A3B8', fontSize: 12, fontWeight: 500 }}>
                   · {status.teams.count} equipos
                 </span>
@@ -203,11 +213,12 @@ export const TrackingShell = ({
             <h1
               style={{
                 margin: 0,
-                fontSize: 28,
+                fontSize: isMobile ? 18 : 28,
                 fontWeight: 700,
-                letterSpacing: -0.6,
+                letterSpacing: isMobile ? -0.2 : -0.6,
                 color: '#0F172A',
-                lineHeight: 1.1,
+                lineHeight: 1.15,
+                wordBreak: 'break-word',
               }}
             >
               {title}
@@ -215,12 +226,13 @@ export const TrackingShell = ({
             {subtitle && (
               <div
                 style={{
-                  marginTop: 8,
+                  marginTop: isMobile ? 4 : 8,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 10,
+                  gap: 8,
                   color: '#64748B',
-                  fontSize: 13,
+                  fontSize: isMobile ? 11.5 : 13,
+                  flexWrap: 'wrap',
                 }}
               >
                 {subtitle}
@@ -233,7 +245,7 @@ export const TrackingShell = ({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 10,
+              gap: isMobile ? 6 : 10,
               flexWrap: 'wrap',
               justifyContent: 'flex-end',
             }}
@@ -246,8 +258,8 @@ export const TrackingShell = ({
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 8,
-                padding: '9px 14px',
+                gap: isMobile ? 0 : 8,
+                padding: isMobile ? '8px 10px' : '9px 14px',
                 borderRadius: 12,
                 border: '1px solid #E2E8F0',
                 background: '#FFFFFF',
@@ -256,13 +268,15 @@ export const TrackingShell = ({
                 fontWeight: 600,
                 cursor: refresh.isPending ? 'wait' : 'pointer',
                 opacity: refresh.isPending ? 0.7 : 1,
+                minHeight: 40,
               }}
               title="Forzar resincronización con Jira"
+              aria-label="Refrescar"
             >
               <Icon.refresh width={16} height={16} />
-              Refrescar
+              {!isMobile && <span>Refrescar</span>}
             </button>
-            {active === 'dashboard' ? (
+            {!isMobile && (active === 'dashboard' ? (
               <button
                 type="button"
                 onClick={() => navigate('/mi-vista')}
@@ -279,6 +293,7 @@ export const TrackingShell = ({
                   fontWeight: 600,
                   cursor: 'pointer',
                   boxShadow: '0 4px 12px rgba(37,99,235,0.30)',
+                  minHeight: 40,
                 }}
               >
                 <Icon.team width={16} height={16} /> Mi Vista
@@ -300,15 +315,100 @@ export const TrackingShell = ({
                   fontWeight: 600,
                   cursor: 'pointer',
                   boxShadow: '0 4px 12px rgba(37,99,235,0.30)',
+                  minHeight: 40,
                 }}
               >
                 <Icon.grid width={16} height={16} /> Dashboard
               </button>
-            )}
+            ))}
           </div>
         </header>
-        <div style={{ flex: 1 }}>{children}</div>
+        <div style={{ flex: 1, paddingBottom: isMobile ? 72 : 0 }}>{children}</div>
+        {isMobile && (
+          <nav
+            style={{
+              position: 'fixed',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 30,
+              background: '#fff',
+              borderTop: `1px solid ${trackingTokens.border.soft}`,
+              boxShadow: '0 -8px 20px rgba(15,23,42,0.06)',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              padding: '6px 6px max(6px, env(safe-area-inset-bottom))',
+              gap: 4,
+            }}
+          >
+            <MobileTab
+              to="/"
+              label="Dashboard"
+              active={active === 'dashboard'}
+              icon={Icon.grid}
+            />
+            <MobileTab
+              to={location.pathname.startsWith('/mi-vista') ? location.pathname : '/mi-vista'}
+              label="Mi Vista"
+              active={active === 'mi-vista'}
+              icon={Icon.team}
+            />
+            <MobileTab to="/teamboard" label="TeamBoard" />
+          </nav>
+        )}
       </main>
     </div>
   );
 };
+
+const MobileTab = ({
+  to,
+  label,
+  active,
+  icon: I,
+}: {
+  to: string;
+  label: string;
+  active?: boolean;
+  icon?: (p: { width?: number; height?: number }) => ReactNode;
+}) => (
+  <Link
+    to={to}
+    aria-label={label}
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 2,
+      padding: '8px 4px',
+      borderRadius: 10,
+      textDecoration: 'none',
+      color: active ? '#2563EB' : '#64748B',
+      background: active ? 'rgba(37,99,235,0.08)' : 'transparent',
+      fontSize: 11,
+      fontWeight: 600,
+      minHeight: 48,
+    }}
+  >
+    {I ? I({ width: 20, height: 20 }) : (
+      <span
+        style={{
+          width: 20,
+          height: 20,
+          borderRadius: 6,
+          background: '#E2E8F0',
+          color: '#475569',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 10,
+          fontWeight: 700,
+        }}
+      >
+        TB
+      </span>
+    )}
+    <span>{label}</span>
+  </Link>
+);
