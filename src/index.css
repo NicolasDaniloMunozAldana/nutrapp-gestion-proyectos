@@ -38,6 +38,12 @@ body {
   min-height: 100vh;
 }
 
+@keyframes tracking-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;

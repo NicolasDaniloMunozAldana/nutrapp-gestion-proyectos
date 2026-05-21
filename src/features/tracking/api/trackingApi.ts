@@ -65,18 +65,52 @@ export const fetchSyncStatus = async (): Promise<TrackingSyncStatusDto> => {
   return data;
 };
 
-export const triggerSyncRefresh = async (): Promise<{
+export type RefreshJobStatus = 'running' | 'done' | 'error';
+
+export interface RefreshJob {
+  id: string;
+  status: RefreshJobStatus;
+  startedAt: string;
+  finishedAt: string | null;
+  generatedAt: string | null;
+  error: string | null;
+}
+
+export interface TriggerRefreshResponse {
   refreshed: boolean;
   retryAfterMs?: number;
-}> => {
+  job: RefreshJob;
+}
+
+export const triggerSyncRefresh = async (): Promise<TriggerRefreshResponse> => {
   try {
-    const { data } = await client.post<{ refreshed: boolean }>('/sync/refresh');
+    // Backend now returns immediately (202) with the job descriptor; the
+    // compose runs in background. Short timeout because this MUST be fast.
+    const { data } = await client.post<TriggerRefreshResponse>(
+      '/sync/refresh',
+      undefined,
+      { timeout: 8_000 },
+    );
     return data;
   } catch (err) {
-    const e = err as { response?: { status?: number; data?: { retryAfterMs?: number } } };
-    if (e.response?.status === 429) {
-      return { refreshed: false, retryAfterMs: e.response.data?.retryAfterMs };
+    const e = err as {
+      response?: { status?: number; data?: TriggerRefreshResponse & { error?: string } };
+    };
+    if (e.response?.status === 429 && e.response.data?.job) {
+      return {
+        refreshed: false,
+        retryAfterMs: e.response.data.retryAfterMs,
+        job: e.response.data.job,
+      };
     }
     throw err;
   }
+};
+
+export const fetchSyncRefreshStatus = async (): Promise<RefreshJob | null> => {
+  const { data } = await client.get<{ job: RefreshJob | null }>(
+    '/sync/refresh/status',
+    { timeout: 8_000 },
+  );
+  return data.job;
 };

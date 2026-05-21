@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fetchMemberDetail } from '../api/trackingApi';
 import type { TrackingFilters } from '../types/tracking';
 
@@ -14,5 +14,6 @@ export const useMemberDetail = (
     gcTime: 5 * 60_000,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
+    placeholderData: keepPreviousData,
   });
 };

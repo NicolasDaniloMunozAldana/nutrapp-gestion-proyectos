@@ -212,31 +212,87 @@ export const TrackingShell = ({
             }}
           >
             {rightSlot}
-            <button
-              type="button"
-              onClick={() => refresh.mutate()}
-              disabled={refresh.isPending}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: isMobile ? 0 : 8,
-                padding: isMobile ? '8px 10px' : '9px 14px',
-                borderRadius: 12,
-                border: '1px solid #E2E8F0',
-                background: '#FFFFFF',
-                color: '#0F172A',
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: refresh.isPending ? 'wait' : 'pointer',
-                opacity: refresh.isPending ? 0.7 : 1,
-                minHeight: 40,
-              }}
-              title="Forzar resincronización con Jira"
-              aria-label="Refrescar"
-            >
-              <Icon.refresh width={16} height={16} />
-              {!isMobile && <span>Refrescar</span>}
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+              <button
+                type="button"
+                onClick={() => refresh.mutate()}
+                disabled={refresh.isRefreshing}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: isMobile ? 6 : 8,
+                  padding: isMobile ? '8px 10px' : '9px 14px',
+                  borderRadius: 12,
+                  border: '1px solid #E2E8F0',
+                  background: refresh.isRefreshing ? '#EFF6FF' : '#FFFFFF',
+                  color: refresh.isRefreshing ? '#1D4ED8' : '#0F172A',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: refresh.isRefreshing ? 'progress' : 'pointer',
+                  opacity: refresh.isRefreshing ? 0.9 : 1,
+                  minHeight: 40,
+                  transition: 'background .15s ease, color .15s ease',
+                }}
+                title={
+                  refresh.isRefreshing
+                    ? 'Actualizando en segundo plano. Puedes seguir usando el dashboard.'
+                    : 'Forzar resincronización con Jira'
+                }
+                aria-label={refresh.isRefreshing ? 'Actualizando' : 'Refrescar'}
+                aria-busy={refresh.isRefreshing}
+              >
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    width: 16,
+                    height: 16,
+                    animation: refresh.isRefreshing ? 'tracking-spin 1s linear infinite' : 'none',
+                  }}
+                >
+                  <Icon.refresh width={16} height={16} />
+                </span>
+                {!isMobile && <span>{refresh.isRefreshing ? 'Actualizando…' : 'Refrescar'}</span>}
+              </button>
+              {refresh.rateLimited && (
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: '#92400E',
+                    background: '#FEF3C7',
+                    padding: '2px 8px',
+                    borderRadius: 999,
+                    fontWeight: 600,
+                  }}
+                  role="status"
+                >
+                  Recién actualizado · espera un momento
+                </span>
+              )}
+              {refresh.error && (
+                <button
+                  type="button"
+                  onClick={refresh.dismissError}
+                  style={{
+                    fontSize: 11,
+                    color: '#B91C1C',
+                    background: '#FEE2E2',
+                    border: 'none',
+                    padding: '2px 8px',
+                    borderRadius: 999,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    maxWidth: 220,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                  title={`${refresh.error} (click para ocultar)`}
+                  role="alert"
+                >
+                  Falló el refresh · descartar
+                </button>
+              )}
+            </div>
             {!isMobile && (active === 'dashboard' ? (
               <button
                 type="button"
