@@ -302,23 +302,30 @@ export const ActiveTicketsTable = ({ tickets, onSelectMember }: ActiveTicketsTab
                       onClick={() => onSelectMember(t.owner.accountId)}
                       title={normalizePersonName(t.owner.name)}
                       style={{
-                        display: 'inline-flex',
+                        display: 'flex',
                         alignItems: 'center',
                         gap: 8,
+                        width: '100%',
+                        minWidth: 0,
                         background: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
                         padding: 0,
+                        margin: 0,
                         color: '#0F172A',
                         fontWeight: 500,
-                        maxWidth: '100%',
-                        overflow: 'hidden',
+                        textAlign: 'left',
+                        lineHeight: 1,
+                        font: 'inherit',
                       }}
                     >
                       <Avatar user={t.owner} size={24} hideStatus />
                       <span
                         style={{
+                          flex: 1,
+                          minWidth: 0,
                           fontSize: 12.5,
+                          lineHeight: 1.2,
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',

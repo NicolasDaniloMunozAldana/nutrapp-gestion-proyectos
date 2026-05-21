@@ -339,23 +339,30 @@ const Body = ({
                       }
                       title={normalizePersonName(t.owner.name)}
                       style={{
-                        display: 'inline-flex',
+                        display: 'flex',
                         alignItems: 'center',
                         gap: 8,
+                        width: '100%',
+                        minWidth: 0,
                         background: 'transparent',
                         border: 'none',
                         cursor: onSelectMember ? 'pointer' : 'default',
                         padding: 0,
+                        margin: 0,
                         color: '#0F172A',
                         fontWeight: 500,
-                        maxWidth: '100%',
-                        overflow: 'hidden',
+                        textAlign: 'left',
+                        lineHeight: 1,
+                        font: 'inherit',
                       }}
                     >
                       <Avatar user={t.owner} size={22} hideStatus />
                       <span
                         style={{
+                          flex: 1,
+                          minWidth: 0,
                           fontSize: 12,
+                          lineHeight: 1.2,
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -488,16 +495,26 @@ export const StateDetailDrawer = ({
             aria-label="Cerrar"
             style={{
               flex: 'none',
-              width: 32,
-              height: 32,
+              width: 36,
+              height: 36,
               borderRadius: 10,
               border: '1px solid #E2E8F0',
-              background: '#fff',
-              color: '#475569',
+              background: '#F1F5F9',
+              color: '#0F172A',
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
+              transition: 'background .15s ease, color .15s ease, border-color .15s ease',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#E2E8F0';
+              e.currentTarget.style.borderColor = '#CBD5E1';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#F1F5F9';
+              e.currentTarget.style.borderColor = '#E2E8F0';
             }}
           >
             <svg width={16} height={16} viewBox="0 0 24 24" fill="none">
