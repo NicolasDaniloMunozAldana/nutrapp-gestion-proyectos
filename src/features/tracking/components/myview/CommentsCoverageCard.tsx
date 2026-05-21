@@ -19,7 +19,7 @@ export const CommentsCoverageCard = ({
         Comentarios esperados vs actuales
       </div>
       <div style={{ fontSize: 11.5, color: '#94A3B8', fontWeight: 500, marginTop: 4 }}>
-        Estimado: 1 comentario por día hábil que la incidencia estuvo en curso
+        Estimado: 1 comentario por día (incl. hoy) desde la Start date en "En proceso"
       </div>
       <div
         style={{
