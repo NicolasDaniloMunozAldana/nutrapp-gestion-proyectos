@@ -74,9 +74,13 @@ export const PersonalHero = ({ member, showRating }: PersonalHeroProps) => {
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: ratingBlock
-          ? 'repeat(auto-fit, minmax(320px, 1fr))'
-          : '1fr',
+        // Desktop: Estados (información principal) ocupa el 70% y Calificación
+        // (panel secundario) el 30%. En mobile se apila verticalmente para
+        // no romper el responsive.
+        gridTemplateColumns:
+          ratingBlock && !isMobile
+            ? 'minmax(0, 7fr) minmax(0, 3fr)'
+            : '1fr',
         gap: 16,
       }}
     >

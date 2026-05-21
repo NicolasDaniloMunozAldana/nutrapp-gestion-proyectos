@@ -1,9 +1,22 @@
+// Brand color (Nutrabiotics corporate). Used selectively on the elements
+// that signal navigation / primary actions; the rest of the palette stays
+// neutral so the UI doesn't get overloaded with purple.
+export const brand = {
+  primary: '#371851',
+  primaryHover: '#26113A',
+  primarySoft: '#F2ECF7',
+  primarySoftHover: '#E4D8EE',
+  borderAccent: '#C9B7D7',
+  onPrimary: '#FFFFFF',
+};
+
 export const trackingTokens = {
   font: 'Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+  brand,
   bg: {
     app: '#F8FAFC',
     card: '#FFFFFF',
-    sidebar: '#0F172A',
+    sidebar: brand.primary,
     soft: '#F1F5F9',
     softer: '#F8FAFC',
   },
