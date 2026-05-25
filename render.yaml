@@ -1,0 +1,20 @@
+# Render Blueprint for the SPA frontend.
+#
+# The app uses BrowserRouter (HTML5 history mode), so deep links such as
+# /mi-vista/:accountId have no matching file on disk. Without an SPA rewrite,
+# reloading those URLs returns Render's 404. This rewrite serves index.html
+# (HTTP 200, URL preserved) for any path that isn't a real static asset, and
+# React Router resolves the route on the client.
+#
+# Render serves existing static files (JS/CSS/images under /assets, etc.)
+# first, so this catch-all only applies to client routes.
+services:
+  - type: web
+    name: nutrapp-gestion-proyectos
+    runtime: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
