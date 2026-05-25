@@ -2,15 +2,17 @@ import { useState, type ReactNode } from 'react';
 import { Card } from '../shared/Card';
 import { Pill } from '../shared/Pill';
 import { Stars } from '../shared/Stars';
+import { AverageCard } from './AverageCard';
 import { localAvatarUrl } from '../shared/Avatar';
 import { colorForUser } from '../../styles/tokens';
 import { useIsMobile } from '../../hooks/useMediaQuery';
 import { normalizePersonName, personInitials } from '../../utils/names';
-import type { TrackingMemberSummaryDto } from '../../types/tracking';
+import type { TrackingMemberSummaryDto, WorkAverageDto } from '../../types/tracking';
 
 interface PersonalHeroProps {
   member: TrackingMemberSummaryDto;
   showRating: boolean;
+  work?: WorkAverageDto;
 }
 
 interface HeroKpiProps {
@@ -63,9 +65,12 @@ const HeroKPI = ({ icon, iconBg, label, value, last }: HeroKpiProps) => (
   </div>
 );
 
-export const PersonalHero = ({ member, showRating }: PersonalHeroProps) => {
+export const PersonalHero = ({ member, showRating, work }: PersonalHeroProps) => {
   const c = colorForUser(member.accountId || member.name);
   const ratingBlock = showRating && member.rating !== null;
+  const hasWork = !!work;
+  // Right column appears when there is a rating block and/or the work average.
+  const showRight = ratingBlock || hasWork;
   const [avatarFailed, setAvatarFailed] = useState(false);
   const heroAvatarSrc = localAvatarUrl(member.accountId);
   const showAvatarImg = !!heroAvatarSrc && !avatarFailed;
@@ -74,11 +79,11 @@ export const PersonalHero = ({ member, showRating }: PersonalHeroProps) => {
     <div
       style={{
         display: 'grid',
-        // Desktop: Estados (información principal) ocupa el 70% y Calificación
-        // (panel secundario) el 30%. En mobile se apila verticalmente para
-        // no romper el responsive.
+        // Desktop: Estados (información principal) ocupa el 70% y el panel
+        // secundario (Calificación + Promedio) el 30%. En mobile se apila
+        // verticalmente para no romper el responsive.
         gridTemplateColumns:
-          ratingBlock && !isMobile
+          showRight && !isMobile
             ? 'minmax(0, 7fr) minmax(0, 3fr)'
             : '1fr',
         gap: 16,
@@ -250,30 +255,36 @@ export const PersonalHero = ({ member, showRating }: PersonalHeroProps) => {
           />
         </div>
       </Card>
-      {ratingBlock && (
-        <Card
-          padding={20}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 10,
-            background: 'linear-gradient(180deg, #FFFBEB 0%, #FFFFFF 60%)',
-          }}
-        >
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#475569' }}>Calificación</div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, lineHeight: 1 }}>
-            <span style={{ fontSize: 48, fontWeight: 800, letterSpacing: -1.6, color: '#0F172A' }}>
-              {(member.rating ?? 0).toFixed(1)}
-            </span>
-            <span style={{ fontSize: 18, color: '#94A3B8', fontWeight: 600 }}>/ 5</span>
-          </div>
-          <Stars value={member.rating ?? 0} size={16} showNumber={false} />
-          <Pill tone="ok" dot>
-            {(member.rating ?? 0) >= 4 ? 'Excelente' : (member.rating ?? 0) >= 3 ? 'Saludable' : 'Atención'}
-          </Pill>
-        </Card>
+      {showRight && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
+          {ratingBlock && (
+            <Card
+              padding={20}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 10,
+                background: 'linear-gradient(180deg, #FFFBEB 0%, #FFFFFF 60%)',
+              }}
+            >
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#475569' }}>Calificación</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, lineHeight: 1 }}>
+                <span style={{ fontSize: 48, fontWeight: 800, letterSpacing: -1.6, color: '#0F172A' }}>
+                  {(member.rating ?? 0).toFixed(1)}
+                </span>
+                <span style={{ fontSize: 18, color: '#94A3B8', fontWeight: 600 }}>/ 5</span>
+              </div>
+              <Stars value={member.rating ?? 0} size={16} showNumber={false} />
+              <Pill tone="ok" dot>
+                {(member.rating ?? 0) >= 4 ? 'Excelente' : (member.rating ?? 0) >= 3 ? 'Saludable' : 'Atención'}
+              </Pill>
+            </Card>
+          )}
+          {/* "Promedio" — sits directly below the rating block. */}
+          {hasWork && <AverageCard work={work!} />}
+        </div>
       )}
     </div>
   );

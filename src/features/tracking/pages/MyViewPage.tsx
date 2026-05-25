@@ -403,7 +403,7 @@ export const MyViewPage = () => {
 
         {activeAccountId && detail && (
           <>
-            <PersonalHero member={detail.member} showRating={showRating} />
+            <PersonalHero member={detail.member} showRating={showRating} work={detail.work} />
             <MetricStrip metrics={detail.metrics} />
             <div
               style={{

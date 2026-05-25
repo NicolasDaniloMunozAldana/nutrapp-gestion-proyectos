@@ -259,9 +259,28 @@ export interface TrackingMemberDetailDto {
     anteriores: number;
     pendientes: number;
   };
+  work: WorkAverageDto;
   completed: TrackingTicketDetailDto[];
   tickets: TrackingTicketDetailDto[];
   upcoming: TrackingPriorityTicketDto[];
+}
+
+export interface DailyWorkLogDto {
+  day: string;
+  firstCommentAt: string;
+  lastCommentAt: string;
+  workedHours: number;
+  commentCount: number;
+}
+
+export type WorkPerformanceTone = 'ok' | 'warn' | 'danger' | 'neutral';
+
+export interface WorkAverageDto {
+  promedio: number | null;
+  label: string | null;
+  tone: WorkPerformanceTone;
+  days: number;
+  daily: DailyWorkLogDto[];
 }
 
 export interface TrackingSyncStatusDto {
