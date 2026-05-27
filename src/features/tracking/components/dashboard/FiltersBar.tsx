@@ -1,8 +1,8 @@
 import type { CSSProperties } from 'react';
 import { trackingTokens } from '../../styles/tokens';
 import { useIsMobile } from '../../hooks/useMediaQuery';
-
-type FilterPreset = 'today' | '7d' | '30d' | 'sprint' | null;
+import { RANGE_PRESETS, PRESET_LABELS } from '../../utils/ranges';
+import type { FilterPreset, PresetAction } from '../../utils/ranges';
 
 interface FiltersBarProps {
   teamOptions: Array<{ id: string; name: string }>;
@@ -14,7 +14,7 @@ interface FiltersBarProps {
   to: string;
   onFromChange: (v: string) => void;
   onToChange: (v: string) => void;
-  onPreset: (preset: 'today' | '7d' | '30d' | 'sprint' | 'clear') => void;
+  onPreset: (preset: PresetAction) => void;
   activePreset?: FilterPreset;
 }
 
@@ -154,14 +154,14 @@ export const FiltersBar = ({
           paddingBottom: isMobile ? 2 : 0,
         }}
       >
-        {(['today', '7d', '30d', 'sprint', 'clear'] as const).map((p) => (
+        {RANGE_PRESETS.map((p) => (
           <button
             key={p}
             type="button"
             onClick={() => onPreset(p)}
             style={chipStyle(p !== 'clear' && activePreset === p, isMobile)}
           >
-            {p === 'today' ? 'Hoy' : p === '7d' ? '7d' : p === '30d' ? '30d' : p === 'sprint' ? 'Sprint' : 'Limpiar'}
+            {PRESET_LABELS[p]}
           </button>
         ))}
       </div>

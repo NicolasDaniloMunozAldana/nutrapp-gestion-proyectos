@@ -15,6 +15,8 @@ import { FiltersBar } from '../components/dashboard/FiltersBar';
 import { StateDetailDrawer } from '../components/dashboard/StateDetailDrawer';
 import { SkeletonCard } from '../components/shared/Skeleton';
 import { useIsMobile, useIsTablet } from '../hooks/useMediaQuery';
+import { defaultRange, rangeForPreset } from '../utils/ranges';
+import type { FilterPreset, PresetAction } from '../utils/ranges';
 import type { TrackingFilters } from '../types/tracking';
 
 const SectionHeader = ({
@@ -57,17 +59,6 @@ const SectionHeader = ({
     {right}
   </div>
 );
-
-const toISODate = (d: Date): string => d.toISOString().slice(0, 10);
-
-const defaultRange = (): { from: string; to: string } => {
-  const now = new Date();
-  const start = new Date(now);
-  start.setDate(now.getDate() - 30);
-  return { from: toISODate(start), to: toISODate(now) };
-};
-
-type FilterPreset = 'today' | '7d' | '30d' | 'sprint' | null;
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
@@ -112,26 +103,16 @@ export const DashboardPage = () => {
     [data?.teams],
   );
 
-  const handlePreset = (preset: 'today' | '7d' | '30d' | 'sprint' | 'clear') => {
-    const now = new Date();
+  const handlePreset = (preset: PresetAction) => {
     if (preset === 'clear') {
       setFrom('');
       setTo('');
       setActivePreset(null);
       return;
     }
-    if (preset === 'today') {
-      const d = toISODate(now);
-      setFrom(d);
-      setTo(d);
-      setActivePreset('today');
-      return;
-    }
-    const days = preset === '7d' ? 7 : preset === '30d' ? 30 : 14;
-    const start = new Date(now);
-    start.setDate(now.getDate() - days);
-    setFrom(toISODate(start));
-    setTo(toISODate(now));
+    const { from: nextFrom, to: nextTo } = rangeForPreset(preset);
+    setFrom(nextFrom);
+    setTo(nextTo);
     setActivePreset(preset);
   };
 

@@ -260,6 +260,9 @@ export interface TrackingMemberDetailDto {
     pendientes: number;
   };
   work: WorkAverageDto;
+  // Earliest activity day (YYYY-MM-DD, Colombia) for this developer; powers the
+  // "Todo" range in Mi Vista. null when unknown.
+  startDate: string | null;
   completed: TrackingTicketDetailDto[];
   tickets: TrackingTicketDetailDto[];
   upcoming: TrackingPriorityTicketDto[];

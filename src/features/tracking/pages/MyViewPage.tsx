@@ -19,20 +19,26 @@ import { MemberCard } from '../components/dashboard/MemberCard';
 import { trackingTokens } from '../styles/tokens';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import { normalizePersonName } from '../utils/names';
+import { defaultRange, rangeForPreset, toISODate } from '../utils/ranges';
 import type { TrackingFilters } from '../types/tracking';
 
 const PRIORITY_OPTIONS = ['Crítica', 'Alta', 'Media', 'Baja'];
 
-const toISODate = (d: Date): string => d.toISOString().slice(0, 10);
+// Mi Vista date presets. Mirrors the general filter ranges plus "Todo", which
+// spans from the developer's first activity to today.
+type FilterPreset = 'today' | '7d' | '30d' | '60d' | 'semester' | 'year' | 'all' | null;
+type PresetAction = Exclude<FilterPreset, null> | 'clear';
 
-const defaultRange = (): { from: string; to: string } => {
-  const now = new Date();
-  const start = new Date(now);
-  start.setDate(now.getDate() - 30);
-  return { from: toISODate(start), to: toISODate(now) };
-};
-
-type FilterPreset = 'today' | '7d' | '30d' | null;
+const MYVIEW_PRESETS: Array<{ key: PresetAction; label: string }> = [
+  { key: 'today', label: 'Hoy' },
+  { key: '7d', label: '7d' },
+  { key: '30d', label: '30d' },
+  { key: '60d', label: '60d' },
+  { key: 'semester', label: 'Semestre' },
+  { key: 'year', label: 'Año' },
+  { key: 'all', label: 'Todo' },
+  { key: 'clear', label: 'Limpiar' },
+];
 
 export const MyViewPage = () => {
   const { accountId: routeAccountId } = useParams<{ accountId?: string }>();
@@ -87,26 +93,24 @@ export const MyViewPage = () => {
     else setPriorities([...priorities, p]);
   };
 
-  const handlePreset = (preset: 'today' | '7d' | '30d' | 'clear') => {
-    const now = new Date();
+  const handlePreset = (preset: PresetAction) => {
     if (preset === 'clear') {
       setFrom('');
       setTo('');
       setActivePreset(null);
       return;
     }
-    if (preset === 'today') {
-      const d = toISODate(now);
-      setFrom(d);
-      setTo(d);
-      setActivePreset('today');
+    if (preset === 'all') {
+      // From the developer's first activity to today. The last valid day is
+      // handled downstream (the work average always excludes the current day).
+      setFrom(detail?.startDate ?? '');
+      setTo(toISODate(new Date()));
+      setActivePreset('all');
       return;
     }
-    const days = preset === '7d' ? 7 : 30;
-    const start = new Date(now);
-    start.setDate(now.getDate() - days);
-    setFrom(toISODate(start));
-    setTo(toISODate(now));
+    const { from: nextFrom, to: nextTo } = rangeForPreset(preset);
+    setFrom(nextFrom);
+    setTo(nextTo);
     setActivePreset(preset);
   };
 
@@ -249,13 +253,13 @@ export const MyViewPage = () => {
                 paddingBottom: isMobile ? 2 : 0,
               }}
             >
-              {(['today', '7d', '30d', 'clear'] as const).map((p) => {
-                const active = p !== 'clear' && activePreset === p;
+              {MYVIEW_PRESETS.map(({ key, label }) => {
+                const active = key !== 'clear' && activePreset === key;
                 return (
                   <button
-                    key={p}
+                    key={key}
                     type="button"
-                    onClick={() => handlePreset(p)}
+                    onClick={() => handlePreset(key)}
                     style={{
                       padding: isMobile ? '8px 12px' : '5px 10px',
                       minHeight: isMobile ? 36 : 'auto',
@@ -269,7 +273,7 @@ export const MyViewPage = () => {
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    {p === 'today' ? 'Hoy' : p === '7d' ? '7d' : p === '30d' ? '30d' : 'Limpiar'}
+                    {label}
                   </button>
                 );
               })}
