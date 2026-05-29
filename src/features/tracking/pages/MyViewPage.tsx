@@ -16,6 +16,7 @@ import { CommentsCoverageCard } from '../components/myview/CommentsCoverageCard'
 import { SkeletonCard } from '../components/shared/Skeleton';
 import { Card } from '../components/shared/Card';
 import { MemberCard } from '../components/dashboard/MemberCard';
+import { StateDetailDrawer } from '../components/dashboard/StateDetailDrawer';
 import { trackingTokens } from '../styles/tokens';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import { normalizePersonName } from '../utils/names';
@@ -50,6 +51,7 @@ export const MyViewPage = () => {
   const [to, setTo] = useState<string>(initialRange.to);
   const [priorities, setPriorities] = useState<string[]>([]);
   const [activePreset, setActivePreset] = useState<FilterPreset>('30d');
+  const [drawerEstado, setDrawerEstado] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const stickyTop = isMobile ? 92 : 112;
   const contentPadding = isMobile ? '12px 12px 32px' : '20px 32px 40px';
@@ -76,6 +78,12 @@ export const MyViewPage = () => {
       navigate(`/mi-vista/${firstAccountId}`, { replace: true });
     }
   }, [activeAccountId, firstAccountId, navigate]);
+
+  // Switching developer closes any open per-estado drawer so it never shows
+  // the previous person's tickets.
+  useEffect(() => {
+    setDrawerEstado(null);
+  }, [activeAccountId]);
 
   const {
     data: detail,
@@ -407,7 +415,12 @@ export const MyViewPage = () => {
 
         {activeAccountId && detail && (
           <>
-            <PersonalHero member={detail.member} showRating={showRating} work={detail.work} />
+            <PersonalHero
+              member={detail.member}
+              showRating={showRating}
+              work={detail.work}
+              onSelectEstado={setDrawerEstado}
+            />
             <MetricStrip metrics={detail.metrics} />
             <div
               style={{
@@ -436,6 +449,13 @@ export const MyViewPage = () => {
           </>
         )}
       </div>
+      <StateDetailDrawer
+        estado={drawerEstado}
+        filters={filters}
+        accountId={activeAccountId}
+        memberName={detail ? normalizePersonName(detail.member.name) : undefined}
+        onClose={() => setDrawerEstado(null)}
+      />
     </TrackingShell>
   );
 };

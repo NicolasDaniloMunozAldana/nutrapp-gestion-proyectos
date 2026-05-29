@@ -13,6 +13,9 @@ interface PersonalHeroProps {
   member: TrackingMemberSummaryDto;
   showRating: boolean;
   work?: WorkAverageDto;
+  // Opens the per-estado drawer for this developer (Mi Vista). When omitted the
+  // hero cards are static (no click affordance).
+  onSelectEstado?: (estado: string) => void;
 }
 
 interface HeroKpiProps {
@@ -21,10 +24,25 @@ interface HeroKpiProps {
   label: string;
   value: number;
   last?: boolean;
+  onClick?: () => void;
 }
 
-const HeroKPI = ({ icon, iconBg, label, value, last }: HeroKpiProps) => (
+const HeroKPI = ({ icon, iconBg, label, value, last, onClick }: HeroKpiProps) => (
   <div
+    role={onClick ? 'button' : undefined}
+    tabIndex={onClick ? 0 : undefined}
+    onClick={onClick}
+    onKeyDown={
+      onClick
+        ? (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onClick();
+            }
+          }
+        : undefined
+    }
+    title={onClick ? `Ver incidencias en "${label}"` : undefined}
     style={{
       padding: '22px 18px',
       borderRight: last ? 'none' : '1px solid #F1F5F9',
@@ -32,7 +50,15 @@ const HeroKPI = ({ icon, iconBg, label, value, last }: HeroKpiProps) => (
       flexDirection: 'column',
       justifyContent: 'center',
       gap: 8,
+      cursor: onClick ? 'pointer' : 'default',
+      transition: 'background .15s ease',
     }}
+    onMouseEnter={
+      onClick ? (e) => (e.currentTarget.style.background = '#F8FAFC') : undefined
+    }
+    onMouseLeave={
+      onClick ? (e) => (e.currentTarget.style.background = 'transparent') : undefined
+    }
   >
     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
       <div
@@ -65,8 +91,15 @@ const HeroKPI = ({ icon, iconBg, label, value, last }: HeroKpiProps) => (
   </div>
 );
 
-export const PersonalHero = ({ member, showRating, work }: PersonalHeroProps) => {
+export const PersonalHero = ({
+  member,
+  showRating,
+  work,
+  onSelectEstado,
+}: PersonalHeroProps) => {
   const c = colorForUser(member.accountId || member.name);
+  const open = (estado: string) =>
+    onSelectEstado ? () => onSelectEstado(estado) : undefined;
   const ratingBlock = showRating && member.rating !== null;
   const hasWork = !!work;
   // Right column appears when there is a rating block and/or the work average.
@@ -168,6 +201,7 @@ export const PersonalHero = ({ member, showRating, work }: PersonalHeroProps) =>
             iconBg="#F1F5F9"
             label="Por hacer"
             value={member.counts.porHacer ?? 0}
+            onClick={open('Por hacer')}
           />
           <HeroKPI
             icon={
@@ -179,6 +213,7 @@ export const PersonalHero = ({ member, showRating, work }: PersonalHeroProps) =>
             iconBg="#EFF6FF"
             label="En curso"
             value={member.counts.enCurso ?? 0}
+            onClick={open('En curso')}
           />
           <HeroKPI
             icon={
@@ -189,6 +224,7 @@ export const PersonalHero = ({ member, showRating, work }: PersonalHeroProps) =>
             iconBg="#ECFEFF"
             label="Despliegue DEV"
             value={member.counts.despliegueDev ?? 0}
+            onClick={open('Despliegue a DEV')}
           />
           <HeroKPI
             icon={
@@ -199,6 +235,7 @@ export const PersonalHero = ({ member, showRating, work }: PersonalHeroProps) =>
             iconBg="#F5F3FF"
             label="Despliegue QA"
             value={member.counts.despliegueQa ?? 0}
+            onClick={open('Despliegue a QA')}
           />
           <HeroKPI
             icon={
@@ -209,6 +246,7 @@ export const PersonalHero = ({ member, showRating, work }: PersonalHeroProps) =>
             iconBg="#FDF2F8"
             label="Despliegue PROD"
             value={member.counts.despliegueProd ?? 0}
+            onClick={open('Despliegue a PROD')}
           />
           <HeroKPI
             icon={
@@ -224,6 +262,7 @@ export const PersonalHero = ({ member, showRating, work }: PersonalHeroProps) =>
             iconBg="#FFF7ED"
             label="Detenidos"
             value={member.counts.detenidos ?? 0}
+            onClick={open('Detenido')}
           />
           <HeroKPI
             icon={
@@ -240,6 +279,7 @@ export const PersonalHero = ({ member, showRating, work }: PersonalHeroProps) =>
             iconBg="#FFFBEB"
             label="Esperando aprob."
             value={member.counts.esperandoAprobacion ?? 0}
+            onClick={open('Esperando aprobación')}
           />
           <HeroKPI
             icon={
@@ -251,6 +291,7 @@ export const PersonalHero = ({ member, showRating, work }: PersonalHeroProps) =>
             iconBg="#F1F5F9"
             label="Total"
             value={member.counts.total}
+            onClick={open('Total')}
             last
           />
         </div>

@@ -5,13 +5,22 @@ import { trackingTokens } from '../../styles/tokens';
 import { useIssuesByEstado } from '../../hooks/useIssuesByEstado';
 import { useIsMobile } from '../../hooks/useMediaQuery';
 import { normalizePersonName } from '../../utils/names';
+import { estadoDisplayLabel } from '../shared/estadoLabel';
 import type { TrackingFilters, TrackingIssueListItemDto } from '../../types/tracking';
+
+// Sentinel estado meaning "every state" — opened from Mi Vista's "Total" card.
+const ALL_ESTADOS = 'Total';
 
 interface StateDetailDrawerProps {
   estado: string | null;
   filters: TrackingFilters;
   onClose: () => void;
   onSelectMember?: (accountId: string) => void;
+  // When set, the drawer is scoped to a single developer (Mi Vista): only that
+  // assignee's issues for the estado are listed and the redundant "Responsable"
+  // column is hidden. `memberName` only feeds the header context label.
+  accountId?: string | null;
+  memberName?: string;
 }
 
 const ROW_BORDER = '1px solid #F1F5F9';
@@ -39,6 +48,22 @@ const truncateCell: CSSProperties = {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   maxWidth: 0,
+};
+
+const estadoPill = (t: TrackingIssueListItemDto) => {
+  const { estado, teamId, teamName } = t;
+  if (estado === 'Por hacer') return <Pill tone="neutral" dot>Por hacer</Pill>;
+  if (estado === 'En curso') return <Pill tone="blue" dot>En curso</Pill>;
+  if (
+    estado === 'Despliegue a DEV' ||
+    estado === 'Despliegue a QA' ||
+    estado === 'Despliegue a PROD'
+  )
+    return <Pill tone="deploy" dot>{estadoDisplayLabel(estado, teamId, teamName)}</Pill>;
+  if (estado === 'Detenido') return <Pill tone="danger" dot>Detenido</Pill>;
+  if (estado === 'Esperando aprobación') return <Pill tone="warn" dot>Esperando aprob.</Pill>;
+  if (estado === 'Completado') return <Pill tone="ok" dot>Completado</Pill>;
+  return <Pill tone="neutral" dot>{estado}</Pill>;
 };
 
 const alertaPill = (a: TrackingIssueListItemDto['alerta']) => {
@@ -72,16 +97,23 @@ const Body = ({
   estado,
   filters,
   onSelectMember,
+  accountId,
 }: {
   estado: string;
   filters: TrackingFilters;
   onSelectMember?: (accountId: string) => void;
+  accountId?: string | null;
 }) => {
   const { data, isLoading, isError, error, refetch, isFetching } = useIssuesByEstado(
     estado,
     filters,
+    accountId,
   );
   const isMobile = useIsMobile();
+  // Scoped to a single developer → the responsable is constant, so drop the column.
+  const hideOwner = !!accountId;
+  // "Total" lists every state at once, so surface an Estado column to tell them apart.
+  const showEstado = estado === ALL_ESTADOS;
 
   if (isLoading) {
     return (
@@ -137,7 +169,13 @@ const Body = ({
           textAlign: 'center',
         }}
       >
-        No hay incidencias en estado <strong>{estado}</strong> con los filtros actuales.
+        {showEstado ? (
+          <>No hay incidencias con los filtros actuales.</>
+        ) : (
+          <>
+            No hay incidencias en estado <strong>{estado}</strong> con los filtros actuales.
+          </>
+        )}
       </div>
     );
   }
@@ -212,7 +250,13 @@ const Body = ({
                   flexWrap: 'wrap',
                 }}
               >
-                {t.owner.accountId ? (
+                {hideOwner ? (
+                  showEstado ? (
+                    <span style={{ flex: 1, minWidth: 0 }}>{estadoPill(t)}</span>
+                  ) : (
+                    <span style={{ flex: 1 }} />
+                  )
+                ) : t.owner.accountId ? (
                   <button
                     type="button"
                     onClick={() => onSelectMember && onSelectMember(t.owner.accountId)}
@@ -286,7 +330,8 @@ const Body = ({
           <colgroup>
             <col style={{ width: 88 }} />
             <col />
-            <col style={{ width: 170 }} />
+            {!hideOwner && <col style={{ width: 170 }} />}
+            {showEstado && <col style={{ width: 132 }} />}
             <col style={{ width: 90 }} />
             <col style={{ width: 96 }} />
             <col style={{ width: 110 }} />
@@ -295,7 +340,8 @@ const Body = ({
             <tr>
               <th style={thStyle}>Jira</th>
               <th style={thStyle}>Resumen</th>
-              <th style={thStyle}>Responsable</th>
+              {!hideOwner && <th style={thStyle}>Responsable</th>}
+              {showEstado && <th style={thStyle}>Estado</th>}
               <th style={thStyle}>Días</th>
               <th style={thStyle}>Vence</th>
               <th style={thStyle}>Alerta</th>
@@ -330,6 +376,7 @@ const Body = ({
                 >
                   {t.summary}
                 </td>
+                {!hideOwner && (
                 <td style={{ ...tdStyle, ...truncateCell }}>
                   {t.owner.accountId ? (
                     <button
@@ -375,6 +422,8 @@ const Body = ({
                     <span style={{ color: '#94A3B8' }}>Sin asignar</span>
                   )}
                 </td>
+                )}
+                {showEstado && <td style={tdStyle}>{estadoPill(t)}</td>}
                 <td style={tdStyle}>
                   <span style={{ fontSize: 13, fontWeight: 500, color: '#0F172A' }}>
                     {t.dias}d
@@ -400,6 +449,8 @@ export const StateDetailDrawer = ({
   filters,
   onClose,
   onSelectMember,
+  accountId,
+  memberName,
 }: StateDetailDrawerProps) => {
   const open = !!estado;
 
@@ -470,7 +521,7 @@ export const StateDetailDrawer = ({
                 letterSpacing: 0.4,
               }}
             >
-              Detalle de estado
+              {memberName ? memberName : 'Detalle de estado'}
             </div>
             <h2
               style={{
@@ -529,7 +580,12 @@ export const StateDetailDrawer = ({
         </header>
         <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
           {estado && (
-            <Body estado={estado} filters={filters} onSelectMember={onSelectMember} />
+            <Body
+              estado={estado}
+              filters={filters}
+              onSelectMember={onSelectMember}
+              accountId={accountId}
+            />
           )}
         </div>
       </aside>

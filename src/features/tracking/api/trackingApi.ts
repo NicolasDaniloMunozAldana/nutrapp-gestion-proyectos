@@ -37,9 +37,14 @@ export const fetchOverview = async (
 export const fetchIssuesByEstado = async (
   estado: string,
   filters?: TrackingFilters,
+  accountId?: string | null,
 ): Promise<TrackingIssueListItemDto[]> => {
+  const params: Record<string, string> = { ...filtersToParams(filters), estado };
+  // When scoped to a developer (Mi Vista) the backend ignores the team filter
+  // and returns only that assignee's issues for the estado.
+  if (accountId) params.assignee = accountId;
   const { data } = await client.get<TrackingIssueListItemDto[]>('/issues', {
-    params: { ...filtersToParams(filters), estado },
+    params,
   });
   return data;
 };
